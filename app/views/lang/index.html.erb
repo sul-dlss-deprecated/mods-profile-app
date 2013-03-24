@@ -6,7 +6,7 @@ d3table();
 
 <script type="text/javascript">
 var w = 960,
-    h = 200,
+    h = 600,
     i = 0,
     barHeight = 20,
     barWidth = w * .8,
@@ -25,18 +25,37 @@ var vis = d3.select("#chart").append("svg:svg")
   .append("svg:g")
     .attr("transform", "translate(20,30)");
 
-var json_data = 		{	"name": "facet",
+var json_data = 		{	"name": "<mods><language>",
 			"children": [
-				{	"name": "first",
-					"children": [
-						{"name": "A", "size": 2},
-						{"name": "B", "size": 3},
+				{"name": "@objectPart", "size": 2},
+				{"name": "@displayLabel", "size": 3},
+				{"name": "@usage", "size": 3},
+				{ "name": "<languageTerm>",
+					"children" : [
+						{"name": "@type", "size": 1},
+						{"name": "@authority", "size": 1},
+						{"name": "@authorityURI", "size": 1},
+						{"name": "@valueURI", "size": 1},
+						{"name": "values",
+							"children": [
+								{"name": "English", "size": 1},
+								{"name": "French", "size": 1},
+							]
+						}
 					]
 				},
-				{	"name": "second",
-					"children": [
-						{"name": "C", "size": 4},
-						{"name": "D", "size": 5},
+				{"name": "<scriptTerm>",
+					"children" : [
+						{"name": "@type", "size": 1},
+						{"name": "@authority", "size": 1},
+						{"name": "@authorityURI", "size": 1},
+						{"name": "@valueURI", "size": 1},
+						{"name": "values",
+							"children": [
+								{"name": "eng", "size": 1},
+								{"name": "fre", "size": 1},
+							]
+						}
 					]
 				}
 			]

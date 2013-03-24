@@ -5,4 +5,12 @@
 
 	<h3>lang content</h3>
 
+	<h4><%= @facet_field.name %></h4>
+
+	<ul>
+		<% @facet_field.items.each do |ff|  %>
+			<li><%= ff.value %>  <%= ff.hits %></li>
+		<% end %>
+	</ul>
+
 </div>

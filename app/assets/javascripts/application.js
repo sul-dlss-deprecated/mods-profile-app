@@ -16,3 +16,5 @@
 // Required by Blacklight
 //= require blacklight/blacklight
 //= require_tree .
+//
+//= require d3.v3

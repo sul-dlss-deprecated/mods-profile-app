@@ -1,63 +1,68 @@
-<div id="chart"></div>
-<%#script language="JavaScript">
-d3table();
-</script>
-%>
+function d3table() {
+	var w = 960,
+	    h = 200,
+	    i = 0,
+	    barHeight = 20,
+	    barWidth = w * .8,
+	    duration = 400,
+	    root;
 
-<script type="text/javascript">
-var w = 960,
-    h = 200,
-    i = 0,
-    barHeight = 20,
-    barWidth = w * .8,
-    duration = 400,
-    root;
+	var tree = d3.layout.tree()
+	    .size([h, 50]);
 
-var tree = d3.layout.tree()
-    .size([h, 100]);
+	var diagonal = d3.svg.diagonal()
+	    .projection(function(d) { return [d.y, d.x]; });
 
-var diagonal = d3.svg.diagonal()
-    .projection(function(d) { return [d.y, d.x]; });
+	var vis = d3.select("#chart").append("svg:svg")
+	    .attr("width", w)
+	    .attr("height", h)
+	  .append("svg:g")
+	    .attr("transform", "translate(20,30)");
 
-var vis = d3.select("#chart").append("svg:svg")
-    .attr("width", w)
-    .attr("height", h)
-  .append("svg:g")
-    .attr("transform", "translate(20,30)");
+  var json_data = 		{	"name": "facet",
+				"children": [
+					{	"name": "first",
+						"children": [
+							{"name": "A", "size": 2},
+							{"name": "B", "size": 3},
+						]
+					},
+					{	"name": "second",
+						"children": [
+							{"name": "C", "size": 4},
+							{"name": "D", "size": 5},
+						]
+					}
+				]
+			}
+			
+	update(root = json_data);
+//	d3.select(self.frameElement).style("height", h + "px");
+	
+//	d3.json("flare.json", function(json) {
+//	d3.json(json_data, function(json) {
+//	  json.x0 = 0;
+//	  json.y0 = 0;
+//	  update(root = json);
+//	});
 
-var json_data = 		{	"name": "facet",
-			"children": [
-				{	"name": "first",
-					"children": [
-						{"name": "A", "size": 2},
-						{"name": "B", "size": 3},
-					]
-				},
-				{	"name": "second",
-					"children": [
-						{"name": "C", "size": 4},
-						{"name": "D", "size": 5},
-					]
-				}
-			]
-		}
-		
-update(root = json_data);
+
+}
 
 function update(source) {
 
   // Compute the flattened node list. TODO use d3.layout.hierarchy.
   var nodes = tree.nodes(root);
-  
+
   // Compute the "layout".
   nodes.forEach(function(n, i) {
     n.x = i * barHeight;
   });
-  
+
   // Update the nodes…
   var node = vis.selectAll("g.node")
       .data(nodes, function(d) { return d.id || (d.id = ++i); });
-  
+
   var nodeEnter = node.enter().append("svg:g")
       .attr("class", "node")
       .attr("transform", function(d) { return "translate(" + source.y0 + "," + source.x0 + ")"; })
@@ -70,36 +75,36 @@ function update(source) {
       .attr("width", barWidth)
       .style("fill", color)
       .on("click", click);
-  
+
   nodeEnter.append("svg:text")
       .attr("dy", 3.5)
       .attr("dx", 5.5)
       .text(function(d) { return d.name; });
-  
+
   // Transition nodes to their new position.
   nodeEnter.transition()
       .duration(duration)
       .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; })
       .style("opacity", 1);
-  
+
   node.transition()
       .duration(duration)
       .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; })
       .style("opacity", 1)
     .select("rect")
       .style("fill", color);
-  
+
   // Transition exiting nodes to the parent's new position.
   node.exit().transition()
       .duration(duration)
       .attr("transform", function(d) { return "translate(" + source.y + "," + source.x + ")"; })
       .style("opacity", 1e-6)
       .remove();
-  
+
   // Update the links…
   var link = vis.selectAll("path.link")
       .data(tree.links(nodes), function(d) { return d.target.id; });
-  
+
   // Enter any new links at the parent's previous position.
   link.enter().insert("svg:path", "g")
       .attr("class", "link")
@@ -110,12 +115,12 @@ function update(source) {
     .transition()
       .duration(duration)
       .attr("d", diagonal);
-  
+
   // Transition links to their new position.
   link.transition()
       .duration(duration)
       .attr("d", diagonal);
-  
+
   // Transition exiting nodes to the parent's new position.
   link.exit().transition()
       .duration(duration)
@@ -124,7 +129,7 @@ function update(source) {
         return diagonal({source: o, target: o});
       })
       .remove();
-  
+
   // Stash the old positions for transition.
   nodes.forEach(function(d) {
     d.x0 = d.x;
@@ -147,22 +152,3 @@ function click(d) {
 function color(d) {
   return d._children ? "#3182bd" : d.children ? "#c6dbef" : "#fd8d3c";
 }
-
-</script>
-
-
-<div id="content" class="span9">
-  <h2 class="hide-text top-content-title"><%= t('blacklight.search.search_results_header') %></h2>
-
-  <% @page_title = t('blacklight.search.title', :application_name => application_name) %>
-
-	<h3>lang content</h3>
-
-	<h4><%= @facet_field.name %></h4>
-
-	<ul>
-		<% @facet_field.items.each do |ff|  %>
-			<li><%= ff.value %>  <%= ff.hits %></li>
-		<% end %>
-	</ul>
-</div>

@@ -1,11 +1,12 @@
 ModsProfilerApp::Application.routes.draw do
   devise_for :users
 
+  Blacklight.add_routes(self)
+
   match 'lang', :to => 'lang#index', :as => 'lang_index'
 
   root :to => "catalog#index"
 
-  Blacklight.add_routes(self)
   
 
   # The priority is based upon order of creation:

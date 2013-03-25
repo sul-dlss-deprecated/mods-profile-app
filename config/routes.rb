@@ -3,7 +3,9 @@ ModsProfilerApp::Application.routes.draw do
 
   Blacklight.add_routes(self)
 
-  match 'lang', :to => 'lang#index', :as => 'lang_index'
+  match 'lang', :to => 'lang#index'
+  match 'lang2', :to => 'lang#index2'
+  match 'mods', :to => 'mods#index'
 
   root :to => "catalog#index"
 

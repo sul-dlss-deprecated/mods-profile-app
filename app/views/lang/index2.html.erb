@@ -5,8 +5,8 @@ d3table();
 %>
 
 <script type="text/javascript">
-var w = 960,
-    h = 500,
+var w = 300,
+    h = 600,
     i = 0,
     barHeight = 20,
     barWidth = w * .8,
@@ -27,37 +27,41 @@ var vis = d3.select("#chart").append("svg:svg")
 
 var json_data = 		{	"name": "<mods><language>",
 			"children": [
-				{"name": "@objectPart", "size": 2},
-				{"name": "@displayLabel", "size": 3},
-				{"name": "@usage", "size": 3},
-				{ "name": "<languageTerm>",
-					"children" : [
-						{"name": "@type", "size": 1},
-						{"name": "@authority", "size": 1},
-						{"name": "@authorityURI", "size": 1},
-						{"name": "@valueURI", "size": 1},
-						{"name": "values",
-							"children": [
-								{"name": "English", "size": 1},
-								{"name": "French", "size": 1},
-							]
-						}
+			{"name": "@displayLabel", "size": 1},
+			{"name": "@usage", "size": 1},
+			{"name": "@objectPart",
+				"children":[
+					{"name": "(not specified)", "size": 1},
+					{"name": "summary or subtitle", "size": 1},
+					]},
+			{"name": "@lang", "size": 1},
+			{"name": "@xml:lang", "size": 1},
+			{"name": "@script", "size": 1},
+			{"name": "@transliteration", "size": 1},
+			{"name": "@altRepGroup", "size": 1},
+			{"name": "<languageTerm>",
+				"children":[
+					{"name": "@type",
+						"children":[
+							{"name": "(not specified)", "size": 1},
+							{"name": "code", "size": 1},
+							{"name": "text", "size": 1},
+							]},
+					{"name": "@authority",
+						"children":[
+							{"name": "(not specified)", "size": 1},
+							{"name": "iso639-2b", "size": 1},
+							{"name": "iso639- 2b", "size": 1},
+							]},
+					{"name": "@authorityURI", "size": 1},
+					{"name": "@valueURI", "size": 1},
+					{"name": "@lang", "size": 1},
+					{"name": "@xml:lang", "size": 1},
+					{"name": "@script", "size": 1},
+					{"name": "@transliteration", "size": 1},
 					]
-				},
-				{"name": "<scriptTerm>",
-					"children" : [
-						{"name": "@type", "size": 1},
-						{"name": "@authority", "size": 1},
-						{"name": "@authorityURI", "size": 1},
-						{"name": "@valueURI", "size": 1},
-						{"name": "values",
-							"children": [
-								{"name": "eng", "size": 1},
-								{"name": "fre", "size": 1},
-							]
-						}
-					]
-				}
+			},
+			{"name": "<scriptTerm>", "size": 1},
 			]
 		}
 		
@@ -186,4 +190,30 @@ function color(d) {
 			<li><%= ff.value %>  <%= ff.hits %></li>
 		<% end %>
 	</ul>
+	
+	<h1>Lang Data</h1>
+	<table id="languageTerm">
+	  <thead>
+	    <tr>
+	      <th>Value</th>
+	      <th>Count</th>
+	    </tr>
+	  </thead>
+	  <tbody>
+	    <%- @facet_field.items.each do |ff| -%>
+	      <tr class="<%= cycle("odd", "even") %>">
+	        <td>
+	          <%= link_to(ff.value, catalog_index_path({:f=>{:language_languageTerm_sim=>[ff.value]}})) %>
+	        </td>
+	        <td><%= ff.hits %></td>
+	      </tr>
+	    <%- end -%>
+	  </tbody>
+
+	</table>
+	<script type="text/javascript">
+	  $("#languageTerm").dataTable();
+	  $("#languageTerm_wrapper input").focus();
+	</script>
 </div>
+

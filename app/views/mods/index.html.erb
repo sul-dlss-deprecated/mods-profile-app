@@ -5,7 +5,7 @@ d3table();
 %>
 
 <script type="text/javascript">
-var w = 960,
+var w = 300,
     h = 500,
     i = 0,
     barHeight = 20,
@@ -25,40 +25,93 @@ var vis = d3.select("#chart").append("svg:svg")
   .append("svg:g")
     .attr("transform", "translate(20,30)");
 
-var json_data = 		{	"name": "<mods><language>",
+var json_data = { "name": "MODS",
 			"children": [
-				{"name": "@objectPart", "size": 2},
-				{"name": "@displayLabel", "size": 3},
-				{"name": "@usage", "size": 3},
-				{ "name": "<languageTerm>",
-					"children" : [
+				{	"name": "<abstract>",
+					"children": [
+						{"name": "@displayLabel",
+							"children":[
+								{"name": "(not specified)", "size": 1},
+								{"name": "Scope and Contents note", "size": 1},
+								{"name": "Summary", "size": 1},
+								{"name": "Description", "size": 1},
+								]},
 						{"name": "@type", "size": 1},
-						{"name": "@authority", "size": 1},
-						{"name": "@authorityURI", "size": 1},
-						{"name": "@valueURI", "size": 1},
-						{"name": "values",
-							"children": [
-								{"name": "English", "size": 1},
-								{"name": "French", "size": 1},
-							]
-						}
+						{"name": "@shareable",
+							"children":[
+								{"name": "(not specified)", "size": 1},
+								{"name": "no", "size": 1},
+								{"name": "yes", "size": 1},
+								]},
+						{"name": "@lang", "size": 1},
+						{"name": "@xml:lang", "size": 1},
+						{"name": "@script", "size": 1},
+						{"name": "@transliteration", "size": 1},
+						{"name": "@altRepGroup", "size": 1},
+						{"name": "@xlink", "size": 1}
 					]
 				},
-				{"name": "<scriptTerm>",
-					"children" : [
+				{	"name": "<genre>",
+					"children": [
+						{"name": "@displayLabel", "size": 1},
 						{"name": "@type", "size": 1},
-						{"name": "@authority", "size": 1},
+						{"name": "@authority",
+							"children":[
+								{"name": "(not specified)", "size": 1},
+								{"name": "lcgft", "size": 1},
+								{"name": "local", "size": 1},
+								{"name": "marcgt", "size": 1},
+								]},
 						{"name": "@authorityURI", "size": 1},
 						{"name": "@valueURI", "size": 1},
-						{"name": "values",
-							"children": [
-								{"name": "eng", "size": 1},
-								{"name": "fre", "size": 1},
-							]
-						}
+						{"name": "@usage", "size": 1},
+						{"name": "@lang", "size": 1},
+						{"name": "@xml:lang", "size": 1},
+						{"name": "@script", "size": 1},
+						{"name": "@transliteration", "size": 1},
+						{"name": "@altRepGroup", "size": 1},
 					]
-				}
-			]
+				},
+				{	"name": "<language>",
+					"children": [
+						{"name": "@displayLabel", "size": 1},
+						{"name": "@usage", "size": 1},
+						{"name": "@objectPart",
+							"children":[
+								{"name": "(not specified)", "size": 1},
+								{"name": "summary or subtitle", "size": 1},
+								]},
+						{"name": "@lang", "size": 1},
+						{"name": "@xml:lang", "size": 1},
+						{"name": "@script", "size": 1},
+						{"name": "@transliteration", "size": 1},
+						{"name": "@altRepGroup", "size": 1},
+						{"name": "<languageTerm>",
+							"children":[
+								{"name": "@type",
+									"children":[
+										{"name": "(not specified)", "size": 1},
+										{"name": "code", "size": 1},
+										{"name": "text", "size": 1},
+										]},
+								{"name": "@authority",
+									"children":[
+										{"name": "(not specified)", "size": 1},
+										{"name": "iso639-2b", "size": 1},
+										{"name": "iso639- 2b", "size": 1},
+										]},
+								{"name": "@authorityURI", "size": 1},
+								{"name": "@valueURI", "size": 1},
+								{"name": "@lang", "size": 1},
+								{"name": "@xml:lang", "size": 1},
+								{"name": "@script", "size": 1},
+								{"name": "@transliteration", "size": 1},
+								]
+						},
+						{"name": "<scriptTerm>", "size": 1},
+					]
+				},
+			]	
 		}
 		
 update(root = json_data);
@@ -177,13 +230,6 @@ function color(d) {
 
   <% @page_title = t('blacklight.search.title', :application_name => application_name) %>
 
-	<h3>lang content</h3>
+	<h3>stuff here</h3>
 
-	<h4><%= @facet_field.name %></h4>
-
-	<ul>
-		<% @facet_field.items.each do |ff|  %>
-			<li><%= ff.value %>  <%= ff.hits %></li>
-		<% end %>
-	</ul>
 </div>

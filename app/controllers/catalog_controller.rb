@@ -51,7 +51,7 @@ class CatalogController < ApplicationController
     #
     # :show may be set to false if you don't want the facet to be drawn in the 
     # facet bar
-    config.add_facet_field 'collection', :label => 'Collection'
+    config.add_facet_field 'collection', :label => 'collection'
     config.add_facet_field 'abstract_sim', :label => '<abstract>', :limit => true
     config.add_facet_field 'accessCondition_sim', :label => '<accessCondition>', :limit => true 
     config.add_facet_field 'classification_sim', :label => '<classification>', :limit => true 

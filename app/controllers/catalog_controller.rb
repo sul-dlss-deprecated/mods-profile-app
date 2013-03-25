@@ -1,9 +1,32 @@
 # -*- encoding : utf-8 -*-
 require 'blacklight/catalog'
+require 'mods_profiler_app/solr_helper'
 
 class CatalogController < ApplicationController  
 
   include Blacklight::Catalog
+  include ModsProfilerApp::SolrHelper
+  
+  # override to provide @coll_facet 
+  def index
+    solr_fname = 'collection'
+    solr_response = get_facet solr_fname
+    my_resp = Blacklight::SolrResponse.new(solr_response, {})
+    @coll_facet = my_resp.facets.select {|f| f.name == solr_fname}.first
+      
+    # original method code
+    extra_head_content << view_context.auto_discovery_link_tag(:rss, url_for(params.merge(:format => 'rss')), :title => t('blacklight.search.rss_feed') )
+    extra_head_content << view_context.auto_discovery_link_tag(:atom, url_for(params.merge(:format => 'atom')), :title => t('blacklight.search.atom_feed') )
+    
+    (@response, @document_list) = get_search_results
+    @filters = params[:f] || []
+    
+    respond_to do |format|
+      format.html { save_current_search_params }
+      format.rss  { render :layout => false }
+      format.atom { render :layout => false }
+    end
+  end
 
   configure_blacklight do |config|
     ## Default parameters to send to solr for all search-like requests. See also SolrHelper#solr_search_params

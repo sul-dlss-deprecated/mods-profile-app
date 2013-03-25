@@ -1,0 +1,25 @@
+<h3>Select a collection</h3>
+
+<table id="facetTable">
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Count</th>
+    </tr>
+  </thead>
+  <tbody>
+    <%- @coll_facet.items.each do |ff| -%>
+      <tr class="<%= cycle("odd", "even") %>">
+        <td>
+          <%= link_to(ff.value, catalog_index_path({:f=>{:collection=>[ff.value]}})) %>
+        </td>
+        <td><%= ff.hits %></td>
+      </tr>
+    <%- end -%>
+  </tbody>
+
+</table>
+<script type="text/javascript">
+  $("#facetTable").dataTable();
+  $("#facetTable_wrapper input").focus();
+</script>

@@ -177,13 +177,29 @@ function color(d) {
 
   <% @page_title = t('blacklight.search.title', :application_name => application_name) %>
 
-	<h3>lang content</h3>
-
 	<h4><%= @facet_field.name %></h4>
 
-	<ul>
-		<% @facet_field.items.each do |ff|  %>
-			<li><%= ff.value %>  <%= ff.hits %></li>
-		<% end %>
-	</ul>
+	<table id="facetTable">
+	  <thead>
+	    <tr>
+	      <th>Value</th>
+	      <th>Count</th>
+	    </tr>
+	  </thead>
+	  <tbody>
+	    <%- @facet_field.items.each do |ff| -%>
+	      <tr class="<%= cycle("odd", "even") %>">
+	        <td>
+	          <%= link_to(ff.value, catalog_index_path({:f=>{:language_languageTerm_sim=>[ff.value]}})) %>
+	        </td>
+	        <td><%= ff.hits %></td>
+	      </tr>
+	    <%- end -%>
+	  </tbody>
+
+	</table>
+	<script type="text/javascript">
+	  $("#facetTable").dataTable();
+	  $("#facetTable_wrapper input").focus();
+	</script>
 </div>

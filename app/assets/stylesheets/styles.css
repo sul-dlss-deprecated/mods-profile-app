@@ -1,0 +1,40 @@
+#facetTable {
+	float: left;
+	width: 98%;
+	text-align: left;
+}
+#facetTable_length, #facetTable_filter, #facetTable_info, #facetTable_paginate {
+	margin: 5px 0;
+	width: 48%;
+	float: left;
+	text-align: left;
+}
+#facetTable_length, #facetTable_paginate {
+  float: right;
+  text-align: right;
+}
+#facetTable_paginate a:hover {
+	cursor: pointer;
+}
+#facetTable_previous {
+	margin-right: 15px;
+}
+#facetTable th {
+	font-weight: bold;
+	cursor: pointer;
+}
+#facetTable td, #facetTable th {
+	padding: 5px 10px;
+}
+#facetTable thead {
+	background-color: #DDDDDD;
+	border-top: 1px solid #CCCCCC;
+}
+#facetTable .even {
+	background-color: #ECECEC;
+	border-bottom: 1px solid #DDDDDD;
+}
+#facetTable .odd {
+	background-color: #F6F6F6;
+	border-bottom: 1px solid #CCCCCC;
+}

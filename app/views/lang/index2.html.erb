@@ -181,18 +181,9 @@ function color(d) {
 
   <% @page_title = t('blacklight.search.title', :application_name => application_name) %>
 
-	<h3>lang content</h3>
-
 	<h4><%= @facet_field.name %></h4>
 
-	<ul>
-		<% @facet_field.items.each do |ff|  %>
-			<li><%= ff.value %>  <%= ff.hits %></li>
-		<% end %>
-	</ul>
-	
-	<h1>Lang Data</h1>
-	<table id="languageTerm">
+	<table id="facetTable">
 	  <thead>
 	    <tr>
 	      <th>Value</th>
@@ -212,8 +203,8 @@ function color(d) {
 
 	</table>
 	<script type="text/javascript">
-	  $("#languageTerm").dataTable();
-	  $("#languageTerm_wrapper input").focus();
+	  $("#facetTable").dataTable();
+	  $("#facetTabel_wrapper input").focus();
 	</script>
 </div>
 

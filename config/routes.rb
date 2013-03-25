@@ -3,12 +3,11 @@ ModsProfilerApp::Application.routes.draw do
 
   Blacklight.add_routes(self)
 
-  match 'lang', :to => 'lang#index'
-  match 'mods', :to => 'mods#index'
+  get 'lang', :to => 'lang#index'
+  get 'mods', :to => 'mods#index'
+  get 'mods/collection/:id', :to => 'mods#collection'
 
   root :to => "catalog#index"
-
-  
 
   # The priority is based upon order of creation:
   # first created -> highest priority.

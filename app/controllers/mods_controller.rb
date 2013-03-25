@@ -13,4 +13,9 @@ class ModsController < ApplicationController
     @facet_field = my_resp.facets.select {|f| f.name == solr_fname}.first
     @facet_field
   end
+  
+  # page for collection
+  def collection
+    # want top level element counts for docs in collection (?)
+  end
 end

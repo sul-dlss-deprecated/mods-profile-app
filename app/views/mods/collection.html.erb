@@ -1,0 +1,17 @@
+<div id="sidebar" class="span3">
+	<%= render :partial=>'mods_tree'%>
+</div>
+
+
+<div id="content" class="span9">
+  <h2 class="hide-text top-content-title"><%= t('blacklight.search.search_results_header') %></h2>
+
+  <% @page_title = t('blacklight.search.title', :application_name => application_name) %>
+
+	<h3>Collection View</h3>
+</div>
+
+<script type="text/javascript">
+svgWarning();
+makeWindVis(location.search.substring(1));
+</script>

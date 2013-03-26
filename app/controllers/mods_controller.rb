@@ -5,8 +5,6 @@ class ModsController < ApplicationController
   
   # get lang data from MODS profiler Solr index
   def index
-#    @mods_json = File.expand_path('../boot', __FILE__)
-#    @mods_json = File.read(File.join(Rails.root, 'test_support/data/mods_elements.json'))
     solr_fname = 'collection'
     solr_response = get_facet solr_fname
     my_resp = Blacklight::SolrResponse.new(solr_response, {})
@@ -14,8 +12,10 @@ class ModsController < ApplicationController
     @facet_field
   end
   
-  # page for collection
+  # landing page for collection -- should this be its own controller?
   def collection
+#    @mods_json = File.expand_path('../boot', __FILE__)
+#    @mods_json = File.read(File.join(Rails.root, 'test_support/data/mods_elements.json'))
     # want top level element counts for docs in collection (?)
   end
 end

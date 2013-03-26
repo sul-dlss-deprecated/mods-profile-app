@@ -12,6 +12,7 @@ module ApplicationHelper
   # :suppress_link => true # do not make it a link, used for an already selected value for instance
   def render_facet_value(facet_solr_field, item, options ={})    
     (link_to_unless(options[:suppress_link], 
+#                    item.label,
                     item.value ? item.label : '(absent)',
                     add_facet_params_and_redirect(facet_solr_field, item), 
                     :class=>"facet_select") +
@@ -26,6 +27,7 @@ module ApplicationHelper
   def should_render_facet? display_facet
     # display when show is nil or true
     display = facet_configuration_for_field(display_facet.name).show != false
+#    return display && display_facet.items.present? 
     return display && display_facet.items.present? && !(display_facet.items.size == 1 && !display_facet.items[0].value)
   end
 

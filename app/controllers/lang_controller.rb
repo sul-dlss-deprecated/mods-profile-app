@@ -41,6 +41,7 @@ class LangController < ApplicationController
     #
     # :show may be set to false if you don't want the facet to be drawn in the 
     # facet bar
+    config.add_facet_field 'collection', :label => 'collection'
     config.add_facet_field 'language_displayLabel_sim', :label => '@displayLabel'
     config.add_facet_field 'language_usage_sim', :label => '@usage', :limit => true
     config.add_facet_field 'language_objectPart_sim', :label => '@objectPart', :limit => true 

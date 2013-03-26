@@ -1,11 +1,14 @@
 <div id="sidebar" class="span3">
-	<%= render :partial=>'lang_tree'%>
+	<%#= render :partial=>'lang_tree'%>
+	<%= render :partial=>'facets' %>
 </div>
 
 <div id="content" class="span9">
   <h2 class="hide-text top-content-title"><%= t('blacklight.search.search_results_header') %></h2>
 
   <% @page_title = t('blacklight.search.title', :application_name => application_name) %>
+
+  <%#= render :partial => 'constraints' %>
 
 	<h4><%= @facet_field.name %></h4>
 

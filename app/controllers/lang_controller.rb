@@ -9,11 +9,12 @@ class LangController < ApplicationController
   # get lang data from MODS profiler Solr index
   def index
     solr_fname = 'language_languageTerm_sim'
-    solr_response = get_facet solr_fname
-    my_resp = Blacklight::SolrResponse.new(solr_response, {})
+#    solr_response = get_facet solr_fname
+#    my_resp = Blacklight::SolrResponse.new(solr_response, {})
+#    @facet_field = my_resp.facets.select {|f| f.name == solr_fname}.first
     (@response, @document_list) = get_search_results # trying to get facet partials working
     @filters = params[:f] || []  # trying to get facet partials working
-    @facet_field = my_resp.facets.select {|f| f.name == solr_fname}.first
+    @facet_field = @response.facets.select {|f| f.name == solr_fname}.first
   end
   
   configure_blacklight do |config|
@@ -49,11 +50,6 @@ class LangController < ApplicationController
     config.add_facet_field 'language_languageTerm_type_sim', :label => '<languageTerm @type >', :limit => true
     config.add_facet_field 'language_languageTerm_authority_sim', :label => '<languageTerm @authority >', :limit => true
     config.add_facet_field 'language_scriptTerm_sim', :label => '<scriptTerm>', :limit => true
-
-    # Have BL send all facet field names to Solr, which has been the default
-    # previously. Simply remove these lines if you'd rather use Solr request
-    # handler defaults, or have no facets.
-    config.add_facet_fields_to_solr_request!
   end
 
 end

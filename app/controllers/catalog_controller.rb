@@ -7,7 +7,7 @@ class CatalogController < ApplicationController
   include Blacklight::Catalog
   include ModsProfilerApp::SolrHelper
   
-  # override to provide @coll_facet 
+  # override to provide @coll_facet for home page
   def index
     solr_fname = 'collection'
     solr_response = get_facet solr_fname
@@ -111,33 +111,33 @@ class CatalogController < ApplicationController
 
     # solr fields to be displayed in the index (search results) view
     #   The ordering of the field names is the order of the display 
-    config.add_index_field 'titleInfo_sim', :label => '<titleInfo>'
-    config.add_index_field 'identifier_sim', :label => '<identifier>'
-    config.add_index_field 'typeOfResource_sim', :label => '<typeOfResource>'
-    config.add_index_field 'location_sim', :label => '<location>'
+#    config.add_index_field 'titleInfo_sim', :label => '<titleInfo>'
+#    config.add_index_field 'identifier_sim', :label => '<identifier>'
+#    config.add_index_field 'typeOfResource_sim', :label => '<typeOfResource>'
+#    config.add_index_field 'location_sim', :label => '<location>'
 
     # solr fields to be displayed in the show (single result) view
     #   The ordering of the field names is the order of the display 
-    config.add_show_field 'abstract_sim', :label => '<abstract>'
-    config.add_show_field 'accessCondition_sim', :label => '<accessCondition>' 
-    config.add_show_field 'classification_sim', :label => '<classification>' 
-    config.add_show_field 'extension_sim', :label => '<extension>'
-    config.add_show_field 'genre_sim', :label => '<genre>'
-    config.add_show_field 'identifier_sim', :label => '<identifier>'
-    config.add_show_field 'language_sim', :label => '<language>'
-    config.add_show_field 'location_sim', :label => '<location>'
-    config.add_show_field 'name_sim', :label => '<name (Top Level)>'
-    config.add_show_field 'note_sim', :label => '<note>'
-    config.add_show_field 'originInfo_sim', :label => '<originInfo>'
-    config.add_show_field 'part_sim', :label => '<part>'
-    config.add_show_field 'physicalDescription_sim', :label => '<physicalDescription>'
-    config.add_show_field 'recordInfo_sim', :label => '<recordInfo>'
-    config.add_show_field 'relatedItem_sim', :label => '<relatedItem>'
-    config.add_show_field 'subject_sim', :label => '<subject>'
-    config.add_show_field 'tableOfContents_sim', :label => '<tableOfContents>'
-    config.add_show_field 'targetAudience_sim', :label => '<targetAudience>'
-    config.add_show_field 'titleInfo_sim', :label => '<titleInfo>'
-    config.add_show_field 'typeOfResource_sim', :label => '<typeOfResource>'
+#    config.add_show_field 'abstract_sim', :label => '<abstract>'
+#    config.add_show_field 'accessCondition_sim', :label => '<accessCondition>' 
+#    config.add_show_field 'classification_sim', :label => '<classification>' 
+#    config.add_show_field 'extension_sim', :label => '<extension>'
+#    config.add_show_field 'genre_sim', :label => '<genre>'
+#    config.add_show_field 'identifier_sim', :label => '<identifier>'
+#    config.add_show_field 'language_sim', :label => '<language>'
+#    config.add_show_field 'location_sim', :label => '<location>'
+#    config.add_show_field 'name_sim', :label => '<name (Top Level)>'
+#    config.add_show_field 'note_sim', :label => '<note>'
+#    config.add_show_field 'originInfo_sim', :label => '<originInfo>'
+#    config.add_show_field 'part_sim', :label => '<part>'
+#    config.add_show_field 'physicalDescription_sim', :label => '<physicalDescription>'
+#    config.add_show_field 'recordInfo_sim', :label => '<recordInfo>'
+#    config.add_show_field 'relatedItem_sim', :label => '<relatedItem>'
+#    config.add_show_field 'subject_sim', :label => '<subject>'
+#    config.add_show_field 'tableOfContents_sim', :label => '<tableOfContents>'
+#    config.add_show_field 'targetAudience_sim', :label => '<targetAudience>'
+#    config.add_show_field 'titleInfo_sim', :label => '<titleInfo>'
+#    config.add_show_field 'typeOfResource_sim', :label => '<typeOfResource>'
 
     # "fielded" search configuration. Used by pulldown among other places.
     # For supported keys in hash, see rdoc for Blacklight::SearchFields

@@ -3,7 +3,7 @@ module ApplicationHelper
     "MODS profile experimental app"
   end
   
-  # OVERRIDE to display missing facet values as '(absent)'
+  # OVERRIDE Blacklight::FacetsHelperBehavior method to display missing facet values as '(absent)'
   # Standard display of a facet value in a list. Used in both _facets sidebar
   # partial and catalog/facet expanded list. Will output facet value name as
   # a link to add that to your restrictions, with count in parens. 
@@ -19,7 +19,7 @@ module ApplicationHelper
     " " + render_facet_count(item.hits)).html_safe
   end
 
-  # OVERRIDE to NOT display if there are ONLY missing values
+  # OVERRIDE Blacklight::FacetsHelperBehavior method to NOT display if there are ONLY missing values
   # Determine if Blacklight should render the display_facet or not
   #
   # By default, only render facets with items.

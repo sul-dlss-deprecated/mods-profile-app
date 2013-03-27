@@ -1,8 +1,8 @@
 require 'blacklight/catalog' # for getting facet partials working
-require 'mods_profiler_app/solr_helper' # for getting facets
+#require 'mods_profiler_app/solr_helper' # for getting facets
 
 class LangController < ApplicationController 
-  include ModsProfilerApp::SolrHelper # for getting facets
+#  include ModsProfilerApp::SolrHelper # for getting facets
   include Blacklight::Configurable # for setting facet fields in Solr response
   include Blacklight::Catalog  # for get_search_results in #index to get facet partials working
   

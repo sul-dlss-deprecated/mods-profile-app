@@ -23,7 +23,7 @@
 	    <%- @facet_field.items.each do |ff| -%>
 	      <tr class="<%= cycle("odd", "even") %>">
 	        <td>
-	          <%= link_to(ff.value, catalog_index_path({:f=>{:language_languageTerm_sim=>[ff.value]}})) %>
+	          <%= link_to(ff.value ? ff.value : '(absent)', catalog_index_path({:f=>{:language_languageTerm_sim=>[ff.value]}})) %>
 	        </td>
 	        <td><%= ff.hits %></td>
 	      </tr>

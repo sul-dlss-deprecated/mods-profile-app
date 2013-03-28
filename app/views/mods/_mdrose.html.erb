@@ -2,7 +2,21 @@
 
 <script type="text/javascript">
 
-	drawBigMetadatarose(fakeData, "#mdrose", "Metadata Rose");
+	function fakeData() {
+		var result = {};
+		result.dirs = [];
+		for (var i=1; i < 13; i++) {
+			result.dirs.push({
+				d: i * 30,  // direction
+//				p: i / 12,  // probability ?
+				s: i  // quantity / size  ?
+			});
+		}
+		return result;
+	}
+
+//	drawBigMetadataRose(fakeData, vis, "Metadata Rose");
+	drawBigMetadataRose(fakeData, "#mdrose", "Metadata Rose");
 
 	var vis = d3.select("#mdrose").append("svg:svg")
 	    .attr("width", 400)
@@ -10,25 +24,16 @@
 	  .append("svg:g")
 	    .attr("transform", "translate(20,30)");
 
-	function fakeData() {
-		var result = {};
-		result.dirs = [];
-		for (var i=0; i < 49; i+4) {
-			result.dirs.push({
-				d: i,
-				// direction of arc ?
-				p: i / 12, 
-				// size of arc ?
-				s: i 
-			});
-		}
-		return result;
-	}
+	var mdElements  = ['abstract', 'genre', 'name', 'language', 'identifier', 'note', 'originInfo', 'physicalDescription', 'subject', 'titleInfo', 'typeOfResource'];
 
-	// Width of the whole visualization; used for centering
-	var visWidth = 500;
+	// Map a wind speed to an outer radius for the chart
+//	var speedToRadiusScale = d3.scale.linear().domain([0, 20]).range([34, visWidth - 20]).clamp(true);
+	var tickRadiusScale = d3.scale.linear().domain([1, 20]).range([34, visWidth - 20]).clamp(true);
 
-	function drawBigMetadatarose(mdroseData, container, captionText) {
+	function drawBigMetadataRose(mdroseData, container, captionText) {
+
+		// Width of the whole visualization; used for centering
+		var visWidth = 400;
 
 		var w = 400,
 			h = 400,
@@ -36,35 +41,45 @@
 			// center; probably broken if not square
 			p = 20,
 			// padding on outside of major elements
-			ip = 34; // padding on inner circle
+			ip = 0; // padding on inner circle
 		// The main SVG visualization element
 		var vis = d3.select(container).append("svg:svg").attr("width", w + "px").attr("height", (h + 30) + "px");
 
 		// Set up axes: circles whose radius represents quantity
 		var ticks = d3.range(5, 20.1, 5);
 		var tickmarks = d3.range(5, 15.1, 5);
-//		var radiusFunction = valToRadiusScale;
+		var radiusFunction = valToRadiusScale;
 		var tickLabel = function(d) {
-				return "" + d + "metadata";
+				return "" + d + "units";
 			}
 
 		// Circles representing chart ticks
-		vis.append("svg:g").attr("class", "axes").selectAll("circle").data(ticks).enter().append("svg:circle").attr("cx", r).attr("cy", r).attr("r", valToRadius(mdroseData));
+//		vis.append("svg:g").attr("class", "axes").selectAll("circle").data(ticks).enter().append("svg:circle").attr("cx", r).attr("cy", r).attr("r", tickRadiusScale);
+		vis.append("svg:g").attr("class", "axes").selectAll("circle").data(ticks).enter().append("svg:circle").attr("stroke-width", 1).attr("stroke", "black").attr("fill", "white").attr("cx", r).attr("cy", r).attr("r", 10);
+//		vis.append("svg:g").attr("class", "axes").selectAll("circle").data(ticks).enter().append("svg:circle").attr("stroke-width", 1).attr("stroke", "black").attr("fill", "white").attr("cx", r).attr("cy", r).attr("r", tickRadiusScale);
 		// Text representing chart tickmarks
 		vis.append("svg:g").attr("class", "tickmarks").selectAll("text").data(tickmarks).enter().append("svg:text").text(tickLabel).attr("dy", "-2px").attr("transform", function(d) {
 			var y = visWidth - valToRadius(d);
 			return "translate(" + r + "," + y + ") "
 		})
 		// Labels: degree markers
-		vis.append("svg:g").attr("class", "labels").selectAll("text").data(d3.range(30, 361, 30)).enter().append("svg:text").attr("dy", "-4px").attr("transform", function(mdroseData) {
-			return "translate(" + r + "," + p + ") rotate(" + mdroseData + ",0," + (r - p) + ")"
+		vis.append("svg:g").attr("class", "labels").selectAll("text").data(d3.range(30, 361, 30)).enter().append("svg:text").attr("dy", "-4px").attr("transform", function(d) {
+			return "translate(" + r + "," + p + ") rotate(" + d + ",0," + (r - p) + ")"
 		}).text(function(dir) {
 			return dir;
 		});
 
+		// Labels:  metadata elements
+//		vis.append("svg:g").attr("class", "labels").selectAll("text").data(d3.values(mdElements)).enter().append("svg:text").attr("dy", "-4px").attr("transform", function(mdroseData) {
+//			return "translate(" + r + "," + p + ") rotate(" + mdroseData + ",0," + (r - p) + ")"
+//		}).text(function(dir) {
+//			return dir;
+//		});
+
+
 //		var rollup = rollupForMonths(mdroseData, selectedMonthControl.selected());
 //		drawComplexArcs(vis, rollup, arcToColor, hoverText, mdroseArcOptions, arcTextT);
-		drawComplexArcs(vis, mdroseData, arcToColor, hoverText, mdroseArcOptions, arcTextT);
+//		drawComplexArcs(vis, mdroseData, arcToColor, hoverText, mdroseArcOptions, arcTextT);
 
 		vis.append("svg:text").text(captionText).attr("class", "caption").attr("transform", "translate(" + w / 2 + "," + (h + 20) + ")");
 	}
@@ -118,7 +133,8 @@
 
 	function valToRadius(d) {
 //		return valToRadiusScale(d.s);
-		return valToRadiusScale;
+//		return valToRadiusScale;
+		return d.s;
 	}
 
 	// Options for drawing the complex arc chart
@@ -175,8 +191,6 @@
 	}
 
 	// Filter input data, giving back frequencies for the selected month
-
-
 	function rollupForMonths(d, months) {
 		var totals = {},
 			speeds = {};
@@ -208,8 +222,6 @@
 	/** Code for big visualization **/
 
 	// Transformation to place a mark on top of an arc
-
-
 	function probArcTextT(d) {
 		var tr = probabilityToRadius(d);
 		return "translate(" + visWidth + "," + (visWidth - tr) + ")" + "rotate(" + d.d + ",0," + tr + ")";
@@ -221,14 +233,10 @@
 	};
 
 	// Return a string representing the wind speed for this datum
-
-
 	function speedText(d) {
 		return d.s < 10 ? "" : d.s.toFixed(0);
 	};
 	// Return a string representing the probability of wind coming from this direction
-
-
 	function probabilityText(d) {
 		return d.p < 0.02 ? "" : (100 * d.p).toFixed(0);
 	};
@@ -273,7 +281,7 @@
 	
 	// Draw a complete wind rose visualization, including axes and center text
 	function drawComplexArcs(parent, plotData, colorFunc, arcTextFunc, complexArcOptions, arcTextT) {
-		// Draw the main wind rose arcs
+		// Draw the main rose arcs
 		parent.append("svg:g").attr("class", "arcs").selectAll("path").data(plotData.dirs).enter().append("svg:path").attr("d", arc(complexArcOptions)).style("fill", colorFunc).attr("transform", "translate(" + visWidth + "," + visWidth + ")").append("svg:title").text(function(d) {
 			return d.d + "\u00b0 " + (100 * d.p).toFixed(1) + "% " + d.s.toFixed(0) + "kts"
 		});
@@ -410,7 +418,7 @@
 		});
 
 		var rollup = rollupForMonths(windroseData, selectedMonthControl.selected());
-		if (container == "#windrose") {
+  	if (container == "#windrose") {
 			drawComplexArcs(vis, rollup, speedToColor, speedText, windroseArcOptions, probArcTextT);
 		} else {
 			drawComplexArcs(vis, rollup, probabilityToColor, probabilityText, windspeedArcOptions, speedArcTextT);
@@ -456,7 +464,5 @@
 		parent.append("svg:g").selectAll("path").data(winds).enter().append("svg:path").attr("d", arc(smallArcOptions));
 		parent.append("svg:circle").attr("r", smallArcOptions.from);
 	}
-
-	drawBigMetadatarose();
 
 </script>

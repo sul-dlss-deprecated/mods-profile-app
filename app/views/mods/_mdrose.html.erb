@@ -1,46 +1,138 @@
-<div id="mdrose">
-<script type="text/javascript">
-function mytest() {
-	var a = document.createElement("div");
-	a.innerHTML = '<div>my test div</div>', document.body.appendChild(a);
-}
+<div id="mdrose"></div>
 
-mytest();
+	<script type="text/javascript">
 
-// Width of the whole visualization; used for centering
-var visWidth = 200;
+	drawBigMetadatarose(fakeData, "#mdrose", "Metadata Rose");
 
-// Function to draw a single arc for the wind rose
-// Input: Drawing options object containing
-// width: degrees of width to draw (ie 5 or 15)
-// from: integer, inner radius
-// to: function returning the outer radius
-// Output: a function that when called, generates SVG paths.
-// It expects to be called via D3 with array of data objects
-//  with three parameters:
-// d: wind direction
-// p: probability of the wind being in this direction
-// s: average speed of the wind in this direction
-var arc = function(o) {
-		return d3.svg.arc().startAngle(function(d) {
-			return (d.d - o.width) * Math.PI / 180;
-		}).endAngle(function(d) {
-			return (d.d + o.width) * Math.PI / 180;
-		}).innerRadius(o.from).outerRadius(function(d) {
-			return o.to(d)
+	var vis = d3.select("#mdrose").append("svg:svg")
+	    .attr("width", 400)
+	    .attr("height", 420)
+	  .append("svg:g")
+	    .attr("transform", "translate(20,30)");
+
+	function fakeData() {
+		var result = {};
+		result.dirs = [];
+		for (var i=0; i < 49; i+4) {
+			result.dirs.push({
+				d: i,
+				// direction of arc ?
+				p: i / 12, 
+				// size of arc ?
+				s: i 
+			});
+		}
+		return result;
+	}
+
+	function drawBigMetadatarose(mdroseData, container, captionText) {
+
+		var w = 400,
+			h = 400,
+			r = Math.min(w, h) / 2,
+			// center; probably broken if not square
+			p = 20,
+			// padding on outside of major elements
+			ip = 34; // padding on inner circle
+		// The main SVG visualization element
+		var vis = d3.select(container).append("svg:svg").attr("width", w + "px").attr("height", (h + 30) + "px");
+
+		// Set up axes: circles whose radius represents quantity
+		var ticks = d3.range(5, 20.1, 5);
+		var tickmarks = d3.range(5, 15.1, 5);
+//		var radiusFunction = valToRadiusScale;
+		var tickLabel = function(d) {
+				return "" + d + "metadata";
+			}
+
+		// Circles representing chart ticks
+		vis.append("svg:g").attr("class", "axes").selectAll("circle").data(ticks).enter().append("svg:circle").attr("cx", r).attr("cy", r).attr("r", valToRadius(mdroseData));
+		// Text representing chart tickmarks
+		vis.append("svg:g").attr("class", "tickmarks").selectAll("text").data(tickmarks).enter().append("svg:text").text(tickLabel).attr("dy", "-2px").attr("transform", function(d) {
+			var y = visWidth - valToRadius(d);
+			return "translate(" + r + "," + y + ") "
+		})
+		// Labels: degree markers
+		vis.append("svg:g").attr("class", "labels").selectAll("text").data(d3.range(30, 361, 30)).enter().append("svg:text").attr("dy", "-4px").attr("transform", function(mdroseData) {
+			return "translate(" + r + "," + p + ") rotate(" + mdroseData + ",0," + (r - p) + ")"
+		}).text(function(dir) {
+			return dir;
 		});
-	};
+
+//		var rollup = rollupForMonths(mdroseData, selectedMonthControl.selected());
+//		drawComplexArcs(vis, rollup, arcToColor, hoverText, mdroseArcOptions, arcTextT);
+		drawComplexArcs(vis, mdroseData, arcToColor, hoverText, mdroseArcOptions, arcTextT);
+
+		vis.append("svg:text").text(captionText).attr("class", "caption").attr("transform", "translate(" + w / 2 + "," + (h + 20) + ")");
+	}
+
+
+
+	// Function to draw a single arc for the wind rose
+	// Input: Drawing options object containing
+	// width: degrees of width to draw (ie 5 or 15)
+	// from: integer, inner radius
+	// to: function returning the outer radius
+	// Output: a function that when called, generates SVG paths.
+	// It expects to be called via D3 with array of data objects
+	//  with three parameters:
+	// d: wind direction
+	// p: probability of the wind being in this direction
+	// s: average speed of the wind in this direction
+	var arc = function(o) {
+			return d3.svg.arc().startAngle(function(d) {
+				return (d.d - o.width) * Math.PI / 180;
+			}).endAngle(function(d) {
+				return (d.d + o.width) * Math.PI / 180;
+			}).innerRadius(o.from).outerRadius(function(d) {
+				return o.to(d)
+			});
+		};
 
 
 	/** Code for data manipulation **/
+
+	// Transformation to place a mark on top of an arc
+	function arcTextT(d) {
+		var tr = valToRadius(d);
+		return "translate(" + visWidth + "," + (visWidth - tr) + ")" + "rotate(" + d.d + ",0," + tr + ")";
+	};
+
+	// Return a string representing d this datum
+	function hoverText(d) {
+		return d.s.toFixed(0);
+	};
+
+	// Map a value to a color
+	var valToColorScale = d3.scale.linear().domain([5, 25]).range(["hsl(220, 70%, 90%)", "hsl(220, 70%, 30%)"]).interpolate(d3.interpolateHsl);
+
+	function arcToColor(d) {
+		return valToColorScale(d.s);
+	}
+
+	// Map a value to an outer radius for the chart
+	var valToRadiusScale = d3.scale.linear().domain([0, 20]).range([34, visWidth - 20]).clamp(true);
+
+	function valToRadius(d) {
+//		return valToRadiusScale(d.s);
+		return valToRadiusScale;
+	}
+
+	// Options for drawing the complex arc chart
+	var mdroseArcOptions = {
+		width: 5,
+		from: 34,
+		to: valToRadius
+	}
+
+
+
 
 	// Convert a dictionary of {direction: total} to frequencies
 	// Output is an array of objects with three parameters:
 	// d: wind direction
 	// p: probability of the wind being in this direction
 	// s: average speed of the wind in this direction
-
-
 	function totalsToFrequencies(totals, speeds) {
 		var sum = 0;
 		// Sum all the values in the dictionary
@@ -177,31 +269,25 @@ var arc = function(o) {
 		from: 34,
 		to: speedToRadius
 	}
+	
+	
 	// Draw a complete wind rose visualization, including axes and center text
-
-
 	function drawComplexArcs(parent, plotData, colorFunc, arcTextFunc, complexArcOptions, arcTextT) {
 		// Draw the main wind rose arcs
 		parent.append("svg:g").attr("class", "arcs").selectAll("path").data(plotData.dirs).enter().append("svg:path").attr("d", arc(complexArcOptions)).style("fill", colorFunc).attr("transform", "translate(" + visWidth + "," + visWidth + ")").append("svg:title").text(function(d) {
 			return d.d + "\u00b0 " + (100 * d.p).toFixed(1) + "% " + d.s.toFixed(0) + "kts"
 		});
-		// Annotate the arcs with speed in text
-		if (false) { // disabled: just looks like chart junk
-			parent.append("svg:g").attr("class", "arctext").selectAll("text").data(plotData.dirs).enter().append("svg:text").text(arcTextFunc).attr("dy", "-3px").attr("transform", arcTextT);
-		}
 
 		// Add the calm wind probability in the center
-		var cw = parent.append("svg:g").attr("class", "calmwind").selectAll("text").data([plotData.calm.p]).enter();
-		cw.append("svg:text").attr("transform", "translate(" + visWidth + "," + visWidth + ")").text(function(d) {
-			return Math.round(d * 100) + "%"
-		});
-		cw.append("svg:text").attr("transform", "translate(" + visWidth + "," + (visWidth + 14) + ")").attr("class", "calmcaption").text("calm");
+//		var cw = parent.append("svg:g").attr("class", "calmwind").selectAll("text").data([plotData.calm.p]).enter();
+//		cw.append("svg:text").attr("transform", "translate(" + visWidth + "," + visWidth + ")").text(function(d) {
+//			return Math.round(d * 100) + "%"
+//		});
+//		cw.append("svg:text").attr("transform", "translate(" + visWidth + "," + (visWidth + 14) + ")").attr("class", "calmcaption").text("calm");
 	}
 
 	// Update the page text after the data has been loaded
 	// Lots of template substitution here
-
-
 	function updatePageText(d) {
 		if (!('info' in d)) {
 			// workaround for stations missing in the master list
@@ -230,16 +316,12 @@ var arc = function(o) {
 	}
 
 	// Update all diagrams to the newly selected months
-
-
 	function updateWindVisDiagrams(d) {
 		updateBigWindrose(d, "#windrose");
 		updateBigWindrose(d, "#windspeed");
 	}
 
 	// Update a specific digram to the newly selected months
-
-
 	function updateBigWindrose(windroseData, container) {
 		var vis = d3.select(container).select("svg");
 		var rollup = rollupForMonths(windroseData, selectedMonthControl.selected());
@@ -252,8 +334,6 @@ var arc = function(o) {
 	}
 
 	// Update drawn arcs, etc to the newly selected months
-
-
 	function updateComplexArcs(parent, plotData, colorFunc, arcTextFunc, complexArcOptions, arcTextT) {
 		// Update the arcs' shape and color
 		parent.select("g.arcs").selectAll("path").data(plotData.dirs).transition().duration(200).style("fill", colorFunc).attr("d", arc(complexArcOptions));
@@ -269,8 +349,6 @@ var arc = function(o) {
 	}
 
 	// Top level function to draw all station diagrams
-
-
 	function makeWindVis(station) {
 		var url = "data/" + station + ".json";
 		var stationData = null;
@@ -289,8 +367,6 @@ var arc = function(o) {
 	}
 
 	// Draw a big wind rose, for the visualization
-
-
 	function drawBigWindrose(windroseData, container, captionText) {
 		// Various visualization size parameters
 		var w = 400,
@@ -381,13 +457,6 @@ var arc = function(o) {
 		parent.append("svg:circle").attr("r", smallArcOptions.from);
 	}
 
-
-var json_data = { "name": "MODS",
-			"children": [
-				{	"name": "<abstract>", "size": 1},
-				{	"name": "<other>", "size": 1}
-			]
-		};
+	drawBigMetadatarose();
 
 </script>
-</div>

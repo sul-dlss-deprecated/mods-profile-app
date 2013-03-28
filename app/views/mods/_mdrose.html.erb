@@ -1,6 +1,6 @@
 <div id="mdrose"></div>
 
-	<script type="text/javascript">
+<script type="text/javascript">
 
 	drawBigMetadatarose(fakeData, "#mdrose", "Metadata Rose");
 
@@ -24,6 +24,9 @@
 		}
 		return result;
 	}
+
+	// Width of the whole visualization; used for centering
+	var visWidth = 500;
 
 	function drawBigMetadatarose(mdroseData, container, captionText) {
 
@@ -242,9 +245,6 @@
 	function probabilityToColor(d) {
 		return probabilityToColorScale(d.p);
 	}
-	// Width of the whole visualization; used for centering
-	var visWidth = 200;
-
 	// Map a wind probability to an outer radius for the chart
 	var probabilityToRadiusScale = d3.scale.linear().domain([0, 0.15]).range([34, visWidth - 20]).clamp(true);
 

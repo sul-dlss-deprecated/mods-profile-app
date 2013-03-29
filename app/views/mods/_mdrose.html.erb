@@ -16,10 +16,10 @@
 	// Width of the whole visualization; used for centering
 	var visWidth = 400;
 
-	drawBigMetadataRose(fakeData, "#mdrose", "Metadata Rose");
+	drawMetadataRose(fakeData, "#mdrose", "Metadata Rose");
 
 
-	function drawBigMetadataRose(mdRoseData, container, captionText) {
+	function drawMetadataRose(mdRoseData, container) {
 
 		var r = visWidth / 2,  // radius of rose; also center pixel for rose width and height
 			p = 20;  // center; probably broken if area not square
@@ -34,13 +34,13 @@
 				return "" + d + " of 'em";
 			}
 
-		// Map a tickring to a radius for the chart
+		// Map a tickring to a radius
 		tickRadiusScale = d3.scale.linear().domain(tickrings).range(d3.range(0, 181, 20)).clamp(true);
-		tickmarkRadiusScale = d3.scale.linear().domain(tickmarks).range(d3.range(20, 161, 40)).clamp(true);
-
 		// Circles representing chart ticks
 		viz.append("svg:g").attr("class", "axes").selectAll("circle").data(tickrings).enter().append("svg:circle").attr("stroke-width", 1).attr("stroke", "black").attr("fill-opacity", 0.0).attr("cx", r).attr("cy", r).attr("r", tickRadiusScale);
 
+		// Map a tickmark to radius
+		tickmarkRadiusScale = d3.scale.linear().domain(tickmarks).range(d3.range(20, 161, 40)).clamp(true);
 		// Text representing chart tickmarks
 		viz.append("svg:g").attr("class", "tickmarks").selectAll("text").data(tickmarks).enter().append("svg:text").text(tickLabel).attr("dy", "-1px").attr("transform", function(d) {
 			var y = visWidth - tickmarkRadiusScale(d);
@@ -65,9 +65,15 @@
 
 
 		// Map a value to a color
-		var valToColorScale = d3.scale.linear().domain([5, 25]).range(["hsl(220, 70%, 90%)", "hsl(220, 70%, 30%)"]).interpolate(d3.interpolateHsl);
+		var valToColorScale = d3.scale.linear().domain([5, 25]).range(["hsl(30, 70%, 70%)", "hsl(250, 70%, 30%)"]).interpolate(d3.interpolateHsl);
 		function arcToColor(d) {
 			return valToColorScale(d.s);
+		}
+
+		// Map a number to a radius size
+		numToRadiusScale = d3.scale.linear().domain([0, visWidth]).range([0, r]).clamp(true);
+		function numToRadius(n) {
+			return numToRadiusScale(n)
 		}
 
 		// Return a string representing d this datum
@@ -75,25 +81,11 @@
 			return d.s.toFixed(0);
 		};
 
-		numToRadiusScale = d3.scale.linear().domain([0, r]).range([0, visWidth]).clamp(true);
-		function numToRadius(n) {
-			return numToRadiusScale(n)
-		}
-
-		// Options for drawing the complex arc chart
-		var mdroseArcOptions = {
-			width: 10,
-			from: 0,
-			to: numToRadius
-		}
-
 		// Transformation to place a mark on top of an arc
 		function arcTextT(d) {
-	//		var tr = valToRadius(d);
-			var tr = d.s;
+			var tr = numToRadius(d);
 			return "translate(" + visWidth + "," + (visWidth - tr) + ")" + "rotate(" + d.d + ",0," + tr + ")";
 		};
-
 
 		// Function to draw a single arc for the metadata rose
 		// Input: Drawing options object containing
@@ -105,7 +97,7 @@
 		//   array of data objects  with two parameters:
 		//     d: direction in degrees
 		//     s: size
-		var arc2 = function(opts) {
+		var roseArc = function(opts) {
 			return d3.svg.arc().startAngle(function(p) {
 				return (p.d - opts.width) * Math.PI / 180;
 			}).endAngle(function(p) {
@@ -115,110 +107,24 @@
 				});
 			};
 
+		// Options for drawing the complex arc chart
+		var mdroseArcOptions = {
+			width: 10,
+			from: 0,
+			to: numToRadius
+		}
+
 		// Draw a complete metadata rose visualization, including axeså
-		function drawMetadataArcs(parent, plotData, colorFunc, arcTextFunc, arcOptions, arcTextT) {
+		function drawMetadataArcs(parent, plotData, colorFunc, arcTextFunc, arcTextT) {
 
 			// Draw the main rose arcs
-			parent.append("svg:g").attr("class", "arcs").selectAll("path").data(plotData).enter().append("svg:path").attr("d", arc2(mdroseArcOptions)).style("fill", colorFunc).attr("transform", "translate("+ visWidth / 2 + "," + visWidth / 2 + ")").append("svg:title").text(function(d) {
+			parent.append("svg:g").attr("class", "arcs").selectAll("path").data(plotData).enter().append("svg:path").attr("d", roseArc(mdroseArcOptions)).style("fill", colorFunc).attr("transform", "translate("+ visWidth / 2 + "," + visWidth / 2 + ")").append("svg:title").text(function(d) {
 				return d.d + "\u00b0; " + d.s.toFixed(0)
 			});
 			if (!1) parent.append("svg:g").attr("class", "arctext").selectAll("text").data(plotData).enter().append("svg:text").text(d).attr("dy", "-3px").attr("transform", arcTextT);
 		}
 
-
 		drawMetadataArcs(viz, mdRoseData, arcToColor, hoverText, mdroseArcOptions, arcTextT);
-
-		viz.append("svg:text").text(captionText).attr("class", "caption").attr("transform", "translate(" + visWidth / 2 + "," + (visWidth + 20) + ")");
-	}
-
-
-
-
-// below this line to be removed
-
-
-	// what the real data looks like
-	var otherData = 
-	{	"info":
-		{	"lat":35.9381,
-			"lon":-89.8319,
-			"name":"BLYTHEVILLE MUNICIPAL AIRPORT","id":"KHKA"
-		},
-		"data":
-		{	"3:270":[57,11.7],
-			"8:300":[43,8.2],
-			"5:130":[124,8.2],
-			"1:60":[76,9.3],
-			"9:10":[188,6.9],
-			"8:60":[90,5.7],
-			"6:350":[63,10.3],
-			"4:70":[67,8.2],
-			"11:null":[362,0.4],
-		"12:230":[124,12.2]
-		},
-		"samples":52757
-	}
-
-
-	// a is hash with key = degree, value = amount
-	// b is hash with key = degree, value = something bigger than amount
-	function totalsToFrequenciesA(a, b) {
-		// compute sum of all amounts
-		var c = 0;
-		for (var d in a) 
-			c += a[d];
-		c == 0 && (c = 1);
-		var result = {};
-		result.dirs = [];
-		result.sum = c;
-		for (var d in a) {
-			var f = a[d] / c,	g;  // f is probability
-			if (a[d] > 0)
-				g = b[d] / a[d];  // i think this should be the second number in the parens for the data
-			else // it was calm
-				g = 0;
-			d == "null"
-			if (a[d] > 0 ? g = b[d] / a[d] : g = 0, d == "null")
-				result.calm = {
-					d: null,
-					p: f,
-					s: null
-				}
-			else 
-				result.dirs.push({
-					d: parseInt(d),
-					p: f,
-					s: g
-				});
-		}
-		return result
-	}
-
-	function rollupForMonthsA(json_data, selected_month) {
-		var c = {},	d = {};
-		c["null"] = 0, d["null"] = 0;
-		// something with degrees 
-		for (var e = 10; e < 361; e += 10) 
-			c["" + e] = 0, d["" + e] = 0;
-			
-		for (var f in json_data.data) {
-			// f is   "3:270":[57,11.7]
-			var g = f.split(":");
-			
-			if (g.length == 1) 
-				var h = g[0];
-			else 
-				var i = g[0], //  month as number, e.g. 11 or 3
-				h = g[1];  //  circle degrees as number, e.g.  130 or 270
-
-			if (selected_month && !selected_month[i - 1]) 
-				continue; // skip to next 
-				
-			// if   line is  "3:270":[57,11.7]
-			c[h] += json_data.data[f][0];       //   c[270] =  57
-			d[h] += json_data.data[f][0] * json_data.data[f][1]    //   d[270] = 57 * 11.7
-		}
-		return totalsToFrequencies(c, d)
 	}
 
 </script>

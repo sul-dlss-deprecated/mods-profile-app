@@ -44,10 +44,8 @@
 			}
 
 		// Map a tickring to a radius for the chart
-		var tickRadiusScale = d3.scale.linear().domain(tickrings).range(d3.range(0, 181, 20)).clamp(true);
+		tickRadiusScale = d3.scale.linear().domain(tickrings).range(d3.range(0, 181, 20)).clamp(true);
 		tickmarkRadiusScale = d3.scale.linear().domain(tickmarks).range(d3.range(20, 161, 40)).clamp(!0);
-//		speedToRadiusScale = d3.scale.linear().domain([0, 20]).range([34, visWidth - 20]).clamp(!0),
-
 
 		// Circles representing chart ticks
 		viz.append("svg:g").attr("class", "axes").selectAll("circle").data(tickrings).enter().append("svg:circle").attr("stroke-width", 1).attr("stroke", "black").attr("fill-opacity", 0.0).attr("cx", r).attr("cy", r).attr("r", tickRadiusScale);
@@ -74,8 +72,6 @@
 //			return dir;
 //		});
 
-
-
 		// Map a value to a color
 		var valToColorScale = d3.scale.linear().domain([5, 25]).range(["hsl(220, 70%, 90%)", "hsl(220, 70%, 30%)"]).interpolate(d3.interpolateHsl);
 		function arcToColor(d) {
@@ -92,8 +88,8 @@
 		var mdroseArcOptions = {
 			width: 5,
 			from: 0,
-	//		to: valToRadius
-			to: 140
+			to: tickRadiusScale
+//			to: 140
 		}
 
 		// Transformation to place a mark on top of an arc
@@ -102,11 +98,15 @@
 			var tr = d.s;
 			return "translate(" + visWidth + "," + (visWidth - tr) + ")" + "rotate(" + d.d + ",0," + tr + ")";
 		};
+		
+		
+		fakeData2 = [];
+		fakeData2.push ({d: 30, s: 50}, {d: 70, s: 70})		
 
 //		var rollup = rollupForMonths(mdroseData, selectedMonthControl.selected());
-//		drawComplexArcs(vis, rollup, arcToColor, hoverText, mdroseArcOptions, arcTextT);
-//		drawComplexArcs(vis, mdroseData, arcToColor, hoverText, mdroseArcOptions, arcTextT);
-		drawMetadataArcs(viz, mdroseData, arcToColor, hoverText, mdroseArcOptions, arcTextT);
+//		drawComplexArcs(viz, rollup, arcToColor, hoverText, mdroseArcOptions, arcTextT);
+//		drawComplexArcs(viz, mdroseData, arcToColor, hoverText, mdroseArcOptions, arcTextT);
+		drawMetadataArcs(viz, fakeData2, arcToColor, hoverText, mdroseArcOptions, arcTextT);
 
 		viz.append("svg:text").text(captionText).attr("class", "caption").attr("transform", "translate(" + visWidth / 2 + "," + (visWidth + 20) + ")");
 	}
@@ -116,17 +116,10 @@
 	function drawMetadataArcs(parent, plotData, colorFunc, arcTextFunc, arcOptions, arcTextT) {
 		// Draw the main rose arcs
 //		parent.append("svg:g").attr("class", "arcs").selectAll("path").data(plotData.dirs).enter().append("svg:path").attr("d", arc(arcOptions)).style("fill", colorFunc).attr("transform", "translate(" + visWidth + "," + visWidth + ")").append("svg:title").text(function(d) {
-		parent.append("svg:g").attr("class", "arcs").selectAll("path").data(fakeData.dirs).enter().append("svg:path").attr("d", arc(arcOptions)).style("fill", colorFunc).attr("transform", "translate(" + visWidth + "," + visWidth + ")").append("svg:title").text(function(d) {
+		parent.append("svg:g").attr("class", "arcs").selectAll("path").data(plotData).enter().append("svg:path").attr("d", arc(arcOptions)).style("fill", colorFunc).attr("transform", "translate(" + visWidth + "," + visWidth + ")").append("svg:title").text(function(d) {
 //			return d.d + "\u00b0 " + d.s.toFixed(0)
 			return "bar";
 		});
-
-		// Add the calm wind probability in the center
-//		var cw = parent.append("svg:g").attr("class", "calmwind").selectAll("text").data([plotData.calm.p]).enter();
-//		cw.append("svg:text").attr("transform", "translate(" + visWidth + "," + visWidth + ")").text(function(d) {
-//			return Math.round(d * 100) + "%"
-//		});
-//		cw.append("svg:text").attr("transform", "translate(" + visWidth + "," + (visWidth + 14) + ")").attr("class", "calmcaption").text("calm");
 	}
 
 

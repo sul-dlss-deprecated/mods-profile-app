@@ -3,26 +3,15 @@
 <script type="text/javascript">
 
 	function fakeData() {
-		var result = {};
-		result.dirs = [];
-		result.sum = 500;  // this should be unnec.
-		result.calm = { // this should also be unnec
-			d: null,
-			p: 5,
-			s: null
-		}
-		for (var i=1; i < 13; i++) {
-			result.dirs.push({
-				d: i * 30,  // direction (degrees of the circle)
-				p: 5, // this should be unnec
-				s: i * i // size
+		var result = [];
+		for (var i=1; i < 37; i++) {
+			result.push({
+				d: i * 10,  // direction (degrees of the circle)
+				s: i  // size
 			});
 		}
 		return result;
 	}
-
-	fakeData2 = [];
-	fakeData2.push ({d: 30, s: 50}, {d: 70, s: 70});
 
 	// Width of the whole visualization; used for centering
 	var visWidth = 400;
@@ -30,7 +19,7 @@
 	drawBigMetadataRose(fakeData, "#mdrose", "Metadata Rose");
 
 
-	function drawBigMetadataRose(mdroseData, container, captionText) {
+	function drawBigMetadataRose(mdRoseData, container, captionText) {
 
 		var r = visWidth / 2,  // radius of rose; also center pixel for rose width and height
 			p = 20;  // center; probably broken if area not square
@@ -68,8 +57,8 @@
 
 		// Labels:  metadata elements
 //		var mdElements  = ['abstract', 'genre', 'name', 'language', 'identifier', 'note', 'originInfo', 'physicalDescription', 'subject', 'titleInfo', 'typeOfResource'];
-//		viz.append("svg:g").attr("class", "labels").selectAll("text").data(d3.values(mdElements)).enter().append("svg:text").attr("dy", "-4px").attr("transform", function(mdroseData) {
-//			return "translate(" + r + "," + p + ") rotate(" + mdroseData + ",0," + (r - p) + ")"
+//		viz.append("svg:g").attr("class", "labels").selectAll("text").data(d3.values(mdElements)).enter().append("svg:text").attr("dy", "-4px").attr("transform", function(mdRoseData) {
+//			return "translate(" + r + "," + p + ") rotate(" + mdRoseData + ",0," + (r - p) + ")"
 //		}).text(function(dir) {
 //			return dir;
 //		});
@@ -137,7 +126,7 @@
 		}
 
 
-		drawMetadataArcs(viz, fakeData2, arcToColor, hoverText, mdroseArcOptions, arcTextT);
+		drawMetadataArcs(viz, mdRoseData, arcToColor, hoverText, mdroseArcOptions, arcTextT);
 
 		viz.append("svg:text").text(captionText).attr("class", "caption").attr("transform", "translate(" + visWidth / 2 + "," + (visWidth + 20) + ")");
 	}

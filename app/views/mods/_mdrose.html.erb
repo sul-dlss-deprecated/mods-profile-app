@@ -38,23 +38,27 @@
 
 		// Set up axes: circles whose radius represents quantity
 		var tickrings = d3.range(0, 181, 20);
-		var tickmarks = d3.range(5, 15.1, 5);
-		var radiusFunction = valToRadiusScale;
+		var tickmarks = d3.range(20, 161, 40);
 		var tickLabel = function(d) {
-				return "" + d + "units";
+				return "" + d + " of 'em";
 			}
 
 		// Map a tickring to a radius for the chart
 		var tickRadiusScale = d3.scale.linear().domain(tickrings).range(d3.range(0, 181, 20)).clamp(true);
+		tickmarkRadiusScale = d3.scale.linear().domain(tickmarks).range(d3.range(20, 161, 40)).clamp(!0);
+//		speedToRadiusScale = d3.scale.linear().domain([0, 20]).range([34, visWidth - 20]).clamp(!0),
+
 
 		// Circles representing chart ticks
 		viz.append("svg:g").attr("class", "axes").selectAll("circle").data(tickrings).enter().append("svg:circle").attr("stroke-width", 1).attr("stroke", "black").attr("fill-opacity", 0.0).attr("cx", r).attr("cy", r).attr("r", tickRadiusScale);
 
 		// Text representing chart tickmarks
-//		viz.append("svg:g").attr("class", "tickmarks").selectAll("text").data(tickmarks).enter().append("svg:text").text(tickLabel).attr("dy", "-2px").attr("transform", function(d) {
-//			var y = visWidth - valToRadius(d);
-//			return "translate(" + r + "," + y + ") "
-//		})
+		viz.append("svg:g").attr("class", "tickmarks").selectAll("text").data(tickmarks).enter().append("svg:text").text(tickLabel).attr("dy", "-1px").attr("transform", function(d) {
+			var y = visWidth - tickmarkRadiusScale(d);
+			y = y - 200;
+			return "translate(" + r + "," + y + ") "
+		})
+		
 		// Labels: degree markers
 		viz.append("svg:g").attr("class", "labels").selectAll("text").data(d3.range(30, 361, 30)).enter().append("svg:text").attr("dy", "-4px").attr("transform", function(d) {
 			return "translate(" + r + "," + p + ") rotate(" + d + ",0," + (r - p) + ")"

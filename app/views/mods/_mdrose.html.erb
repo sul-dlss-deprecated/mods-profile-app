@@ -15,14 +15,11 @@
 		return result;
 	}
 
+	// Width of the whole visualization; used for centering
+	var visWidth = 400;
+
 //	drawBigMetadataRose(fakeData, vis, "Metadata Rose");
 	drawBigMetadataRose(fakeData, "#mdrose", "Metadata Rose");
-
-	var vis = d3.select("#mdrose").append("svg:svg")
-	    .attr("width", 400)
-	    .attr("height", 420)
-	  .append("svg:g")
-	    .attr("transform", "translate(20,30)");
 
 	var mdElements  = ['abstract', 'genre', 'name', 'language', 'identifier', 'note', 'originInfo', 'physicalDescription', 'subject', 'titleInfo', 'typeOfResource'];
 
@@ -32,9 +29,6 @@
 
 	function drawBigMetadataRose(mdroseData, container, captionText) {
 
-		// Width of the whole visualization; used for centering
-		var visWidth = 400;
-
 		var w = 400,
 			h = 400,
 			r = Math.min(w, h) / 2,
@@ -42,8 +36,9 @@
 			p = 20,
 			// padding on outside of major elements
 			ip = 0; // padding on inner circle
+			
 		// The main SVG visualization element
-		var vis = d3.select(container).append("svg:svg").attr("width", w + "px").attr("height", (h + 30) + "px");
+		var viz = d3.select(container).append("svg:svg").attr("width", w + "px").attr("height", (h + 30) + "px");
 
 		// Set up axes: circles whose radius represents quantity
 		var ticks = d3.range(5, 20.1, 5);
@@ -54,23 +49,28 @@
 			}
 
 		// Circles representing chart ticks
-//		vis.append("svg:g").attr("class", "axes").selectAll("circle").data(ticks).enter().append("svg:circle").attr("cx", r).attr("cy", r).attr("r", tickRadiusScale);
-		vis.append("svg:g").attr("class", "axes").selectAll("circle").data(ticks).enter().append("svg:circle").attr("stroke-width", 1).attr("stroke", "black").attr("fill", "white").attr("cx", r).attr("cy", r).attr("r", 10);
-//		vis.append("svg:g").attr("class", "axes").selectAll("circle").data(ticks).enter().append("svg:circle").attr("stroke-width", 1).attr("stroke", "black").attr("fill", "white").attr("cx", r).attr("cy", r).attr("r", tickRadiusScale);
+//		viz.append("svg:g").attr("class", "axes").selectAll("circle").data(ticks).enter().append("svg:circle").attr("cx", r).attr("cy", r).attr("r", tickRadiusScale);
+//		viz.append("svg:g").attr("class", "axes").selectAll("circle").data(ticks).enter().append("svg:circle").attr("stroke-width", 1).attr("stroke", "black").attr("fill", "white").attr("cx", r).attr("cy", r).attr("r", 10);
+		viz.append("svg:g").attr("class", "axes").selectAll("circle").data(d3.range(10, 50, 10)).enter().append("svg:circle").attr("stroke-width", 1).attr("stroke", "black").attr("fill", "white").attr("cx", r).attr("cy", r).attr("r", function(d) {
+			return d
+		});
+//		i.append("svg:g").attr("class", "axes").selectAll("circle").data(j).enter().append("svg:circle").attr("fill", "white").attr("cx", f).attr("cy", f).attr("r", l)
+		
+//		viz.append("svg:g").attr("class", "axes").selectAll("circle").data(ticks).enter().append("svg:circle").attr("stroke-width", 1).attr("stroke", "black").attr("fill", "white").attr("cx", r).attr("cy", r).attr("r", tickRadiusScale);
 		// Text representing chart tickmarks
-		vis.append("svg:g").attr("class", "tickmarks").selectAll("text").data(tickmarks).enter().append("svg:text").text(tickLabel).attr("dy", "-2px").attr("transform", function(d) {
-			var y = visWidth - valToRadius(d);
-			return "translate(" + r + "," + y + ") "
-		})
+//		viz.append("svg:g").attr("class", "tickmarks").selectAll("text").data(tickmarks).enter().append("svg:text").text(tickLabel).attr("dy", "-2px").attr("transform", function(d) {
+//			var y = visWidth - valToRadius(d);
+//			return "translate(" + r + "," + y + ") "
+//		})
 		// Labels: degree markers
-		vis.append("svg:g").attr("class", "labels").selectAll("text").data(d3.range(30, 361, 30)).enter().append("svg:text").attr("dy", "-4px").attr("transform", function(d) {
+		viz.append("svg:g").attr("class", "labels").selectAll("text").data(d3.range(30, 361, 30)).enter().append("svg:text").attr("dy", "-4px").attr("transform", function(d) {
 			return "translate(" + r + "," + p + ") rotate(" + d + ",0," + (r - p) + ")"
 		}).text(function(dir) {
 			return dir;
 		});
 
 		// Labels:  metadata elements
-//		vis.append("svg:g").attr("class", "labels").selectAll("text").data(d3.values(mdElements)).enter().append("svg:text").attr("dy", "-4px").attr("transform", function(mdroseData) {
+//		viz.append("svg:g").attr("class", "labels").selectAll("text").data(d3.values(mdElements)).enter().append("svg:text").attr("dy", "-4px").attr("transform", function(mdroseData) {
 //			return "translate(" + r + "," + p + ") rotate(" + mdroseData + ",0," + (r - p) + ")"
 //		}).text(function(dir) {
 //			return dir;
@@ -81,7 +81,7 @@
 //		drawComplexArcs(vis, rollup, arcToColor, hoverText, mdroseArcOptions, arcTextT);
 //		drawComplexArcs(vis, mdroseData, arcToColor, hoverText, mdroseArcOptions, arcTextT);
 
-		vis.append("svg:text").text(captionText).attr("class", "caption").attr("transform", "translate(" + w / 2 + "," + (h + 20) + ")");
+		viz.append("svg:text").text(captionText).attr("class", "caption").attr("transform", "translate(" + w / 2 + "," + (h + 20) + ")");
 	}
 
 

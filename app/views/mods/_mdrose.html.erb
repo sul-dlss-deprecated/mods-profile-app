@@ -80,15 +80,19 @@
 
 		// Return a string representing d this datum
 		function hoverText(d) {
-//			return d.s.toFixed(0);
-			return 'foo';
+			return d.s.toFixed(0);
 		};
+
+		numToRadiusScale = d3.scale.linear().domain([0, 20]).range([0, visWidth - 20]).clamp(!0);
+		function numToRadius(n) {
+			return numToRadiusScale(n)
+		}
 
 		// Options for drawing the complex arc chart
 		var mdroseArcOptions = {
 			width: 5,
 			from: 0,
-			to: tickRadiusScale
+			to: numToRadius
 //			to: 140
 		}
 
@@ -117,8 +121,7 @@
 		// Draw the main rose arcs
 //		parent.append("svg:g").attr("class", "arcs").selectAll("path").data(plotData.dirs).enter().append("svg:path").attr("d", arc(arcOptions)).style("fill", colorFunc).attr("transform", "translate(" + visWidth + "," + visWidth + ")").append("svg:title").text(function(d) {
 		parent.append("svg:g").attr("class", "arcs").selectAll("path").data(plotData).enter().append("svg:path").attr("d", arc(arcOptions)).style("fill", colorFunc).attr("transform", "translate(" + visWidth + "," + visWidth + ")").append("svg:title").text(function(d) {
-//			return d.d + "\u00b0 " + d.s.toFixed(0)
-			return "bar";
+			return d.d + "\u00b0 " + d.s.toFixed(0)
 		});
 	}
 

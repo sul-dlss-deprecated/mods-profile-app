@@ -5,11 +5,17 @@
 	function fakeData() {
 		var result = {};
 		result.dirs = [];
+		result.sum = 500;  // this should be unnec.
+		result.calm = { // this should also be unnec
+			d: null,
+			p: 5,
+			s: null
+		}
 		for (var i=1; i < 13; i++) {
 			result.dirs.push({
-				d: i * 30,  // direction
-//				p: i / 12,  // probability ?
-				s: i  // quantity / size  ?
+				d: i * 30,  // direction (degrees of the circle)
+				p: 5, // this should be unnec
+				s: i * i // size
 			});
 		}
 		return result;
@@ -21,8 +27,6 @@
 //	drawBigMetadataRose(fakeData, vis, "Metadata Rose");
 	drawBigMetadataRose(fakeData, "#mdrose", "Metadata Rose");
 
-	var mdElements  = ['abstract', 'genre', 'name', 'language', 'identifier', 'note', 'originInfo', 'physicalDescription', 'subject', 'titleInfo', 'typeOfResource'];
-
 
 	function drawBigMetadataRose(mdroseData, container, captionText) {
 
@@ -32,28 +36,20 @@
 		// The main SVG visualization element
 		var viz = d3.select(container).append("svg:svg").attr("width", visWidth + "px").attr("height", (visWidth + 30) + "px");
 
-		// Map a tickring to a radius for the chart
-		var tickRadiusScale = d3.scale.linear().domain([0, 180]).range([0, visWidth - 20]).clamp(true);
-
 		// Set up axes: circles whose radius represents quantity
-		var tickrings = d3.range(5, 20.1, 5);
+		var tickrings = d3.range(0, 181, 20);
 		var tickmarks = d3.range(5, 15.1, 5);
 		var radiusFunction = valToRadiusScale;
 		var tickLabel = function(d) {
 				return "" + d + "units";
 			}
 
-		// Circles representing chart ticks
-//		viz.append("svg:g").attr("class", "axes").selectAll("circle").data(tickrings).enter().append("svg:circle").attr("cx", r).attr("cy", r).attr("r", tickRadiusScale);
-//		viz.append("svg:g").attr("class", "axes").selectAll("circle").data(tickrings).enter().append("svg:circle").attr("stroke-width", 1).attr("stroke", "black").attr("fill", "white").attr("cx", r).attr("cy", r).attr("r", 10);
-	viz.append("svg:g").attr("class", "axes").selectAll("circle").data(tickrings).enter().append("svg:circle").attr("stroke-width", 1).attr("stroke", "black").attr("fill", "white").attr("cx", r).attr("cy", r).attr("r", tickRadiusScale);
-//		viz.append("svg:g").attr("class", "axes").selectAll("circle").data(tickrings).enter().append("svg:circle").attr("stroke-width", 1).attr("stroke", "black").attr("fill", "white").attr("cx", r).attr("cy", r).attr("r", function(d) {
-//			return d;
-//		});
-//		i.append("svg:g").attr("class", "axes").selectAll("circle").data(j).enter().append("svg:circle").attr("fill", "white").attr("cx", f).attr("cy", f).attr("r", l)
+		// Map a tickring to a radius for the chart
+		var tickRadiusScale = d3.scale.linear().domain(tickrings).range(d3.range(0, 181, 20)).clamp(true);
 
-		
-//		viz.append("svg:g").attr("class", "axes").selectAll("circle").data(ticks).enter().append("svg:circle").attr("stroke-width", 1).attr("stroke", "black").attr("fill", "white").attr("cx", r).attr("cy", r).attr("r", tickRadiusScale);
+		// Circles representing chart ticks
+		viz.append("svg:g").attr("class", "axes").selectAll("circle").data(tickrings).enter().append("svg:circle").attr("stroke-width", 1).attr("stroke", "black").attr("fill-opacity", 0.0).attr("cx", r).attr("cy", r).attr("r", tickRadiusScale);
+
 		// Text representing chart tickmarks
 //		viz.append("svg:g").attr("class", "tickmarks").selectAll("text").data(tickmarks).enter().append("svg:text").text(tickLabel).attr("dy", "-2px").attr("transform", function(d) {
 //			var y = visWidth - valToRadius(d);
@@ -67,6 +63,7 @@
 		});
 
 		// Labels:  metadata elements
+//		var mdElements  = ['abstract', 'genre', 'name', 'language', 'identifier', 'note', 'originInfo', 'physicalDescription', 'subject', 'titleInfo', 'typeOfResource'];
 //		viz.append("svg:g").attr("class", "labels").selectAll("text").data(d3.values(mdElements)).enter().append("svg:text").attr("dy", "-4px").attr("transform", function(mdroseData) {
 //			return "translate(" + r + "," + p + ") rotate(" + mdroseData + ",0," + (r - p) + ")"
 //		}).text(function(dir) {
@@ -74,26 +71,160 @@
 //		});
 
 
+
+		// Map a value to a color
+		var valToColorScale = d3.scale.linear().domain([5, 25]).range(["hsl(220, 70%, 90%)", "hsl(220, 70%, 30%)"]).interpolate(d3.interpolateHsl);
+		function arcToColor(d) {
+			return valToColorScale(d.s);
+		}
+
+		// Return a string representing d this datum
+		function hoverText(d) {
+//			return d.s.toFixed(0);
+			return 'foo';
+		};
+
+		// Options for drawing the complex arc chart
+		var mdroseArcOptions = {
+			width: 5,
+			from: 0,
+	//		to: valToRadius
+			to: 140
+		}
+
+		// Transformation to place a mark on top of an arc
+		function arcTextT(d) {
+//			var tr = valToRadius(d);
+			var tr = d.s;
+			return "translate(" + visWidth + "," + (visWidth - tr) + ")" + "rotate(" + d.d + ",0," + tr + ")";
+		};
+
 //		var rollup = rollupForMonths(mdroseData, selectedMonthControl.selected());
 //		drawComplexArcs(vis, rollup, arcToColor, hoverText, mdroseArcOptions, arcTextT);
 //		drawComplexArcs(vis, mdroseData, arcToColor, hoverText, mdroseArcOptions, arcTextT);
+		drawMetadataArcs(viz, mdroseData, arcToColor, hoverText, mdroseArcOptions, arcTextT);
 
 		viz.append("svg:text").text(captionText).attr("class", "caption").attr("transform", "translate(" + visWidth / 2 + "," + (visWidth + 20) + ")");
 	}
 
 
+	// Draw a complete metadata rose visualization, including axeså
+	function drawMetadataArcs(parent, plotData, colorFunc, arcTextFunc, arcOptions, arcTextT) {
+		// Draw the main rose arcs
+//		parent.append("svg:g").attr("class", "arcs").selectAll("path").data(plotData.dirs).enter().append("svg:path").attr("d", arc(arcOptions)).style("fill", colorFunc).attr("transform", "translate(" + visWidth + "," + visWidth + ")").append("svg:title").text(function(d) {
+		parent.append("svg:g").attr("class", "arcs").selectAll("path").data(fakeData.dirs).enter().append("svg:path").attr("d", arc(arcOptions)).style("fill", colorFunc).attr("transform", "translate(" + visWidth + "," + visWidth + ")").append("svg:title").text(function(d) {
+//			return d.d + "\u00b0 " + d.s.toFixed(0)
+			return "bar";
+		});
 
-	// Function to draw a single arc for the wind rose
+		// Add the calm wind probability in the center
+//		var cw = parent.append("svg:g").attr("class", "calmwind").selectAll("text").data([plotData.calm.p]).enter();
+//		cw.append("svg:text").attr("transform", "translate(" + visWidth + "," + visWidth + ")").text(function(d) {
+//			return Math.round(d * 100) + "%"
+//		});
+//		cw.append("svg:text").attr("transform", "translate(" + visWidth + "," + (visWidth + 14) + ")").attr("class", "calmcaption").text("calm");
+	}
+
+
+
+	// what the real data looks like
+	var otherData = 
+	{	"info":
+		{	"lat":35.9381,
+			"lon":-89.8319,
+			"name":"BLYTHEVILLE MUNICIPAL AIRPORT","id":"KHKA"
+		},
+		"data":
+		{	"3:270":[57,11.7],
+			"8:300":[43,8.2],
+			"5:130":[124,8.2],
+			"1:60":[76,9.3],
+			"9:10":[188,6.9],
+			"8:60":[90,5.7],
+			"6:350":[63,10.3],
+			"4:70":[67,8.2],
+			"11:null":[362,0.4],
+		"12:230":[124,12.2]
+		},
+		"samples":52757
+	}
+
+
+	// a is hash with key = degree, value = amount
+	// b is hash with key = degree, value = something bigger than amount
+	function totalsToFrequenciesA(a, b) {
+		// compute sum of all amounts
+		var c = 0;
+		for (var d in a) 
+			c += a[d];
+		c == 0 && (c = 1);
+		var result = {};
+		result.dirs = [];
+		result.sum = c;
+		for (var d in a) {
+			var f = a[d] / c,	g;  // f is probability
+			if (a[d] > 0)
+				g = b[d] / a[d];  // i think this should be the second number in the parens for the data
+			else // it was calm
+				g = 0;
+			d == "null"
+			if (a[d] > 0 ? g = b[d] / a[d] : g = 0, d == "null")
+				result.calm = {
+					d: null,
+					p: f,
+					s: null
+				}
+			else 
+				result.dirs.push({
+					d: parseInt(d),
+					p: f,
+					s: g
+				});
+		}
+		return result
+	}
+
+	function rollupForMonthsA(json_data, selected_month) {
+		var c = {},	d = {};
+		c["null"] = 0, d["null"] = 0;
+		// something with degrees 
+		for (var e = 10; e < 361; e += 10) 
+			c["" + e] = 0, d["" + e] = 0;
+			
+		for (var f in json_data.data) {
+			// f is   "3:270":[57,11.7]
+			var g = f.split(":");
+			
+			if (g.length == 1) 
+				var h = g[0];
+			else 
+				var i = g[0], //  month as number, e.g. 11 or 3
+				h = g[1];  //  circle degrees as number, e.g.  130 or 270
+
+			if (selected_month && !selected_month[i - 1]) 
+				continue; // skip to next 
+				
+			// if   line is  "3:270":[57,11.7]
+			c[h] += json_data.data[f][0];       //   c[270] =  57
+			d[h] += json_data.data[f][0] * json_data.data[f][1]    //   d[270] = 57 * 11.7
+		}
+		return totalsToFrequencies(c, d)
+	}
+
+
+
+
+
+	// Function to draw a single arc for the metadata rose
 	// Input: Drawing options object containing
 	// width: degrees of width to draw (ie 5 or 15)
 	// from: integer, inner radius
 	// to: function returning the outer radius
 	// Output: a function that when called, generates SVG paths.
 	// It expects to be called via D3 with array of data objects
-	//  with three parameters:
-	// d: wind direction
-	// p: probability of the wind being in this direction
-	// s: average speed of the wind in this direction
+	//  with two parameters:
+	// d: direction
+	// s: size
 	var arc = function(o) {
 			return d3.svg.arc().startAngle(function(d) {
 				return (d.d - o.width) * Math.PI / 180;
@@ -104,27 +235,6 @@
 			});
 		};
 
-
-	/** Code for data manipulation **/
-
-	// Transformation to place a mark on top of an arc
-	function arcTextT(d) {
-		var tr = valToRadius(d);
-		return "translate(" + visWidth + "," + (visWidth - tr) + ")" + "rotate(" + d.d + ",0," + tr + ")";
-	};
-
-	// Return a string representing d this datum
-	function hoverText(d) {
-		return d.s.toFixed(0);
-	};
-
-	// Map a value to a color
-	var valToColorScale = d3.scale.linear().domain([5, 25]).range(["hsl(220, 70%, 90%)", "hsl(220, 70%, 30%)"]).interpolate(d3.interpolateHsl);
-
-	function arcToColor(d) {
-		return valToColorScale(d.s);
-	}
-
 	// Map a value to an outer radius for the chart
 	var valToRadiusScale = d3.scale.linear().domain([0, 20]).range([34, visWidth - 20]).clamp(true);
 
@@ -134,12 +244,10 @@
 		return d.s;
 	}
 
-	// Options for drawing the complex arc chart
-	var mdroseArcOptions = {
-		width: 5,
-		from: 34,
-		to: valToRadius
-	}
+
+
+
+
 
 
 

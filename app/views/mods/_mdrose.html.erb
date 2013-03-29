@@ -21,6 +21,9 @@
 		return result;
 	}
 
+	fakeData2 = [];
+	fakeData2.push ({d: 30, s: 50}, {d: 70, s: 70});
+
 	// Width of the whole visualization; used for centering
 	var visWidth = 400;
 
@@ -30,7 +33,7 @@
 	function drawBigMetadataRose(mdroseData, container, captionText) {
 
 		var r = visWidth / 2,  // radius of rose; also center pixel for rose width and height
-			p = 20;  // center; probably broken if not square
+			p = 20;  // center; probably broken if area not square
 			
 		// The main SVG visualization element
 		var viz = d3.select(container).append("svg:svg").attr("width", visWidth + "px").attr("height", (visWidth + 30) + "px");
@@ -44,7 +47,7 @@
 
 		// Map a tickring to a radius for the chart
 		tickRadiusScale = d3.scale.linear().domain(tickrings).range(d3.range(0, 181, 20)).clamp(true);
-		tickmarkRadiusScale = d3.scale.linear().domain(tickmarks).range(d3.range(20, 161, 40)).clamp(!0);
+		tickmarkRadiusScale = d3.scale.linear().domain(tickmarks).range(d3.range(20, 161, 40)).clamp(true);
 
 		// Circles representing chart ticks
 		viz.append("svg:g").attr("class", "axes").selectAll("circle").data(tickrings).enter().append("svg:circle").attr("stroke-width", 1).attr("stroke", "black").attr("fill-opacity", 0.0).attr("cx", r).attr("cy", r).attr("r", tickRadiusScale);
@@ -83,17 +86,16 @@
 			return d.s.toFixed(0);
 		};
 
-		numToRadiusScale = d3.scale.linear().domain([0, 20]).range([0, visWidth - 20]).clamp(!0);
+		numToRadiusScale = d3.scale.linear().domain([0, r]).range([0, visWidth]).clamp(true);
 		function numToRadius(n) {
 			return numToRadiusScale(n)
 		}
 
 		// Options for drawing the complex arc chart
 		var mdroseArcOptions = {
-			width: 60,
+			width: 10,
 			from: 0,
-	//		to: numToRadius
-			to: 500
+			to: numToRadius
 		}
 
 		// Transformation to place a mark on top of an arc
@@ -102,7 +104,6 @@
 			var tr = d.s;
 			return "translate(" + visWidth + "," + (visWidth - tr) + ")" + "rotate(" + d.d + ",0," + tr + ")";
 		};
-
 
 
 		// Function to draw a single arc for the metadata rose
@@ -116,43 +117,26 @@
 		//     d: direction in degrees
 		//     s: size
 		var arc2 = function(opts) {
-				return d3.svg.arc().startAngle(30 * Math.PI / 180).endAngle(90 * Math.PI / 180).innerRadius(5).outerRadius(100);
-/*
-				return d3.svg.arc().startAngle(function(p) {
-					return (p.d - opts.width) * Math.PI / 180;
-				}).endAngle(function(p) {
-					return (p.d + opts.width) * Math.PI / 180;
-				}).innerRadius(opts.from).outerRadius(function(p) {
-					return opts.to(p)
+			return d3.svg.arc().startAngle(function(p) {
+				return (p.d - opts.width) * Math.PI / 180;
+			}).endAngle(function(p) {
+				return (p.d + opts.width) * Math.PI / 180;
+			}).innerRadius(opts.from).outerRadius(function(p) {
+					return opts.to(p.d)
 				});
-*/
 			};
-
-
 
 		// Draw a complete metadata rose visualization, including axeså
 		function drawMetadataArcs(parent, plotData, colorFunc, arcTextFunc, arcOptions, arcTextT) {
-			fakeData3 = [];
-			fakeData3.push ({
-				d: 30, 
-				s: 50
-			});
 
 			// Draw the main rose arcs
-	//		parent.append("svg:g").attr("class", "arcs").selectAll("path").data(plotData.dirs).enter().append("svg:path").attr("d", arc2(mdroseArcOptions)).style("fill", colorFunc).attr("transform", "translate(" + visWidth + "," + visWidth + ")").append("svg:title").text(function(d) {
-			parent.append("svg:g").attr("class", "arcs").selectAll("path").data(fakeData3).enter().append("svg:path").attr("d", arc2(mdroseArcOptions)).style("fill", colorFunc).attr("transform", "translate("+ visWidth / 2 + "," + visWidth / 2 + ")").append("svg:title").text(function(d) {
+			parent.append("svg:g").attr("class", "arcs").selectAll("path").data(plotData).enter().append("svg:path").attr("d", arc2(mdroseArcOptions)).style("fill", colorFunc).attr("transform", "translate("+ visWidth / 2 + "," + visWidth / 2 + ")").append("svg:title").text(function(d) {
 				return d.d + "\u00b0; " + d.s.toFixed(0)
 			});
 			if (!1) parent.append("svg:g").attr("class", "arctext").selectAll("text").data(plotData).enter().append("svg:text").text(d).attr("dy", "-3px").attr("transform", arcTextT);
 		}
 
 
-		fakeData2 = [];
-		fakeData2.push ({d: 30, s: 50}, {d: 70, s: 70});
-
-//		var rollup = rollupForMonths(mdroseData, selectedMonthControl.selected());
-//		drawComplexArcs(viz, rollup, arcToColor, hoverText, mdroseArcOptions, arcTextT);
-//		drawComplexArcs(viz, mdroseData, arcToColor, hoverText, mdroseArcOptions, arcTextT);
 		drawMetadataArcs(viz, fakeData2, arcToColor, hoverText, mdroseArcOptions, arcTextT);
 
 		viz.append("svg:text").text(captionText).attr("class", "caption").attr("transform", "translate(" + visWidth / 2 + "," + (visWidth + 20) + ")");

@@ -23,25 +23,20 @@
 
 	var mdElements  = ['abstract', 'genre', 'name', 'language', 'identifier', 'note', 'originInfo', 'physicalDescription', 'subject', 'titleInfo', 'typeOfResource'];
 
-	// Map a wind speed to an outer radius for the chart
-//	var speedToRadiusScale = d3.scale.linear().domain([0, 20]).range([34, visWidth - 20]).clamp(true);
-	var tickRadiusScale = d3.scale.linear().domain([1, 20]).range([34, visWidth - 20]).clamp(true);
 
 	function drawBigMetadataRose(mdroseData, container, captionText) {
 
-		var w = 400,
-			h = 400,
-			r = Math.min(w, h) / 2,
-			// center; probably broken if not square
-			p = 20,
-			// padding on outside of major elements
-			ip = 0; // padding on inner circle
+		var r = visWidth / 2,  // radius of rose; also center pixel for rose width and height
+			p = 20;  // center; probably broken if not square
 			
 		// The main SVG visualization element
-		var viz = d3.select(container).append("svg:svg").attr("width", w + "px").attr("height", (h + 30) + "px");
+		var viz = d3.select(container).append("svg:svg").attr("width", visWidth + "px").attr("height", (visWidth + 30) + "px");
+
+		// Map a tickring to a radius for the chart
+		var tickRadiusScale = d3.scale.linear().domain([0, 180]).range([0, visWidth - 20]).clamp(true);
 
 		// Set up axes: circles whose radius represents quantity
-		var ticks = d3.range(5, 20.1, 5);
+		var tickrings = d3.range(5, 20.1, 5);
 		var tickmarks = d3.range(5, 15.1, 5);
 		var radiusFunction = valToRadiusScale;
 		var tickLabel = function(d) {
@@ -49,12 +44,14 @@
 			}
 
 		// Circles representing chart ticks
-//		viz.append("svg:g").attr("class", "axes").selectAll("circle").data(ticks).enter().append("svg:circle").attr("cx", r).attr("cy", r).attr("r", tickRadiusScale);
-//		viz.append("svg:g").attr("class", "axes").selectAll("circle").data(ticks).enter().append("svg:circle").attr("stroke-width", 1).attr("stroke", "black").attr("fill", "white").attr("cx", r).attr("cy", r).attr("r", 10);
-		viz.append("svg:g").attr("class", "axes").selectAll("circle").data(d3.range(10, 50, 10)).enter().append("svg:circle").attr("stroke-width", 1).attr("stroke", "black").attr("fill", "white").attr("cx", r).attr("cy", r).attr("r", function(d) {
-			return d
-		});
+//		viz.append("svg:g").attr("class", "axes").selectAll("circle").data(tickrings).enter().append("svg:circle").attr("cx", r).attr("cy", r).attr("r", tickRadiusScale);
+//		viz.append("svg:g").attr("class", "axes").selectAll("circle").data(tickrings).enter().append("svg:circle").attr("stroke-width", 1).attr("stroke", "black").attr("fill", "white").attr("cx", r).attr("cy", r).attr("r", 10);
+	viz.append("svg:g").attr("class", "axes").selectAll("circle").data(tickrings).enter().append("svg:circle").attr("stroke-width", 1).attr("stroke", "black").attr("fill", "white").attr("cx", r).attr("cy", r).attr("r", tickRadiusScale);
+//		viz.append("svg:g").attr("class", "axes").selectAll("circle").data(tickrings).enter().append("svg:circle").attr("stroke-width", 1).attr("stroke", "black").attr("fill", "white").attr("cx", r).attr("cy", r).attr("r", function(d) {
+//			return d;
+//		});
 //		i.append("svg:g").attr("class", "axes").selectAll("circle").data(j).enter().append("svg:circle").attr("fill", "white").attr("cx", f).attr("cy", f).attr("r", l)
+
 		
 //		viz.append("svg:g").attr("class", "axes").selectAll("circle").data(ticks).enter().append("svg:circle").attr("stroke-width", 1).attr("stroke", "black").attr("fill", "white").attr("cx", r).attr("cy", r).attr("r", tickRadiusScale);
 		// Text representing chart tickmarks
@@ -81,7 +78,7 @@
 //		drawComplexArcs(vis, rollup, arcToColor, hoverText, mdroseArcOptions, arcTextT);
 //		drawComplexArcs(vis, mdroseData, arcToColor, hoverText, mdroseArcOptions, arcTextT);
 
-		viz.append("svg:text").text(captionText).attr("class", "caption").attr("transform", "translate(" + w / 2 + "," + (h + 20) + ")");
+		viz.append("svg:text").text(captionText).attr("class", "caption").attr("transform", "translate(" + visWidth / 2 + "," + (visWidth + 20) + ")");
 	}
 
 

@@ -112,15 +112,12 @@
 		// Return a string representing d this datum
 		function hoverText(d) {
 //			return d.s.toFixed(0);
-//			return degrees2modsEls[d.d];
-			return 'foo';
+			return degrees2modsEls[d.d].substring(0, Math.min(3, degrees2modsEls[d.d].length));
 		};
 
 		// Transformation to place a mark on top of an arc
 		function arcTextT(d) {
 			var tr = numToRadius(d.d);
-//			return "translate(" + visWidth + "," + (visWidth - tr) + ")" + "rotate(" + d.d + ",0," + tr + ")";
-//			return "translate(" + r + "," + r + ")" + "rotate(" + d.d + ",0," + tr + ")";
 			return "translate(" + visWidth/2 + "," + (visWidth/2 - tr) + ")" + "rotate(" + d.d + ",0," + tr + ")";
 		};
 
@@ -186,7 +183,7 @@
 		var p = 20;  // center; probably broken if area not square
 //		viz.append("svg:g").attr("class", "labels").selectAll("text").data(d3.range(30, 361, 30)).enter().append("svg:text").attr("dy", "-4px").attr("transform", function(d) {
 //			return "translate(" + r + "," + p + ") rotate(" + d + ",0," + (r - p) + ")"
-		viz.append("svg:g").attr("class", "labels").selectAll("text").data(mdElements).enter().append("svg:text").attr("dy", "-4px").attr("transform", function(d) {
+		viz.append("svg:g").attr("class", "labels").selectAll("text").data(mdElements).enter().append("svg:text").attr("x", 40).attr("dy", "-4px").attr("transform", function(d) {
 //			return "translate(" + r + "," + p + ") rotate(" + modsEls2Degrees[d] + ",0," + (r - p) + ")"
 			return "translate(" + r + "," + p + ") rotate(" + modsEls2Degrees[d] + ",0," + (r - p) + ")"
 		}).text(function(d) {

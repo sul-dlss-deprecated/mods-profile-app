@@ -51,12 +51,12 @@
 		var result = [];
 		for (var k in h) {
 	    // use hasOwnProperty to filter out keys from the Object.prototype
-//	    if (h.hasOwnProperty(k)) {
+	    if (h.hasOwnProperty(k)) {
 				result.push({
 					d: modsEls2Degrees[k],  // direction (degrees of the circle)
 					s: h[k] // size
 				})
-//			}
+			}
 		}
 		return result;
 	}
@@ -96,9 +96,9 @@
 		return numToRadiusScale(n)
 	}
 
-//	drawMetadataRose(realerData, "#mdrose", visSize);
+	drawMetadataRose(realerData, "#mdrose", visSize);
 //	drawMetadataRose(fakeData, "#mdrose", visSize);
-	drawMetadataRose(prepData(myData), '#mdrose', visSize);
+//	drawMetadataRose(prepData(myData), '#mdrose', visSize);
 
 
 	// Draw a complete metadata rose visualization, including axes
@@ -118,11 +118,12 @@
 		function arcTextT(d) {
 			var tr = numToRadius(d);
 			return "translate(" + visWidth + "," + (visWidth - tr) + ")" + "rotate(" + d.d + ",0," + tr + ")";
+//			return "foo";
 		};
 
 		// Options for drawing the roseArc
 		var mdroseArcOptions = {
-			width: 10, // degrees of width to draw (ie 5 or 15)
+			width: 8, // degrees of width to draw
 			from: 0, // starting radius
 			to: numToRadius
 		}
@@ -151,7 +152,7 @@
 			parent.append("svg:g").attr("class", "arcs").selectAll("path").data(plotData).enter().append("svg:path").attr("d", roseArc(mdroseArcOptions)).style("fill", colorFunc).attr("transform", "translate("+ visWidth / 2 + "," + visWidth / 2 + ")").append("svg:title").text(function(d) {
 				return d.d + "\u00b0; " + d.s.toFixed(0)
 			});
-			if (!1) parent.append("svg:g").attr("class", "arctext").selectAll("text").data(plotData).enter().append("svg:text").text(d).attr("dy", "-3px").attr("transform", arcTextT);
+//			parent.append("svg:g").attr("class", "arctext").selectAll("text").data(plotData).enter().append("svg:text").text(d).attr("dy", "-3px").attr("transform", arcTextT);
 		}
 
 		drawMetadataArcs(viz, mdRoseData, arcToColor, hoverText, mdroseArcOptions, arcTextT);

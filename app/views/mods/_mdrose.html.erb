@@ -119,8 +119,9 @@
 		// Transformation to place a mark on top of an arc
 		function arcTextT(d) {
 			var tr = numToRadius(d.d);
-			return "translate(" + visWidth / 2 + "," + (visWidth - tr) + ")" + "rotate(" + d.d + ",0," + tr + ")";
-//			return "foo";
+//			return "translate(" + visWidth + "," + (visWidth - tr) + ")" + "rotate(" + d.d + ",0," + tr + ")";
+//			return "translate(" + r + "," + r + ")" + "rotate(" + d.d + ",0," + tr + ")";
+			return "translate(" + visWidth/2 + "," + (visWidth/2 - tr) + ")" + "rotate(" + d.d + ",0," + tr + ")";
 		};
 
 		// Options for drawing the roseArc

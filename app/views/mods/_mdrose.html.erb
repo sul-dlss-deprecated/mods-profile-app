@@ -117,7 +117,7 @@
 		// Transformation to place a mark on top of an arc
 		function arcTextT(d) {
 			var tr = numToRadius(d);
-			return "translate(" + visWidth + "," + (visWidth - tr) + ")" + "rotate(" + d.d + ",0," + tr + ")";
+			return "translate(" + r + "," + (visWidth - tr) + ")" + "rotate(" + d.d + ",0," + tr + ")";
 //			return "foo";
 		};
 
@@ -152,10 +152,12 @@
 			parent.append("svg:g").attr("class", "arcs").selectAll("path").data(plotData).enter().append("svg:path").attr("d", roseArc(mdroseArcOptions)).style("fill", colorFunc).attr("transform", "translate("+ visWidth / 2 + "," + visWidth / 2 + ")").append("svg:title").text(function(d) {
 				return d.d + "\u00b0; " + d.s.toFixed(0)
 			});
-//			parent.append("svg:g").attr("class", "arctext").selectAll("text").data(plotData).enter().append("svg:text").text(d).attr("dy", "-3px").attr("transform", arcTextT);
+			
+			// add text to arcs
+//			parent.append("svg:g").attr("class", "arctext").selectAll("text").data(plotData).enter().append("svg:text").text(arcTextFunc).attr("dy", "-3px").attr("transform", arcTextT);
 		}
 
-		drawMetadataArcs(viz, mdRoseData, arcToColor, hoverText, mdroseArcOptions, arcTextT);
+		drawMetadataArcs(viz, mdRoseData, arcToColor, hoverText, arcTextT);
 		
 		// Axes circles - chart ticks
 		var tickrings = d3.range(0, 181, 20);

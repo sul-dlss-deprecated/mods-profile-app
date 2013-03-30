@@ -111,13 +111,15 @@
 
 		// Return a string representing d this datum
 		function hoverText(d) {
-			return d.s.toFixed(0);
+//			return d.s.toFixed(0);
+//			return degrees2modsEls[d.d];
+			return 'foo';
 		};
 
 		// Transformation to place a mark on top of an arc
 		function arcTextT(d) {
-			var tr = numToRadius(d);
-			return "translate(" + r + "," + (visWidth - tr) + ")" + "rotate(" + d.d + ",0," + tr + ")";
+			var tr = numToRadius(d.d);
+			return "translate(" + visWidth / 2 + "," + (visWidth - tr) + ")" + "rotate(" + d.d + ",0," + tr + ")";
 //			return "foo";
 		};
 
@@ -154,10 +156,13 @@
 			});
 			
 			// add text to arcs
-//			parent.append("svg:g").attr("class", "arctext").selectAll("text").data(plotData).enter().append("svg:text").text(arcTextFunc).attr("dy", "-3px").attr("transform", arcTextT);
+			parent.append("svg:g").attr("class", "arctext").selectAll("text").data(plotData).enter().append("svg:text").text(arcTextFunc).attr("dy", "-3px").attr("transform", arcTextT);
 		}
 
 		drawMetadataArcs(viz, mdRoseData, arcToColor, hoverText, arcTextT);
+		
+		
+		// --- Labels and Axes in the Rose ---
 		
 		// Axes circles - chart ticks
 		var tickrings = d3.range(0, 181, 20);

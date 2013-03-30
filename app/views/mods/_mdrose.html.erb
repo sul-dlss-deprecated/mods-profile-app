@@ -40,6 +40,27 @@
 	}	
 	populateMappings();
 
+	var myData = {
+		'abstract' : 5,
+		'subject' : 2,
+		'titleInfo' : 3,
+		'identifier' : 4,
+		'typeOfResource' : 5};
+
+	function prepData(h) {
+		var result = [];
+		for (var k in h) {
+	    // use hasOwnProperty to filter out keys from the Object.prototype
+//	    if (h.hasOwnProperty(k)) {
+				result.push({
+					d: modsEls2Degrees[k],  // direction (degrees of the circle)
+					s: h[k] // size
+				})
+//			}
+		}
+		return result;
+	}
+
 	function realerData() {
 		var result = [];
 		for (var i=0; i < mdElements.length; i++) {
@@ -69,13 +90,15 @@
 	}
 
 	// Map a number to a radius size
-	numToRadiusScale = d3.scale.linear().domain([0, visSize]).range([0, visSize / 2]).clamp(true);
+//	numToRadiusScale = d3.scale.linear().domain([0, visSize]).range([0, visSize / 2]).clamp(true);
+	numToRadiusScale = d3.scale.linear().domain([0, visSize]).range([0, visSize / 2]);
 	function numToRadius(n) {
 		return numToRadiusScale(n)
 	}
 
-	drawMetadataRose(realerData, "#mdrose", visSize);
+//	drawMetadataRose(realerData, "#mdrose", visSize);
 //	drawMetadataRose(fakeData, "#mdrose", visSize);
+	drawMetadataRose(prepData(myData), '#mdrose', visSize);
 
 
 	// Draw a complete metadata rose visualization, including axes
@@ -152,10 +175,13 @@
 
 		// Labels: degree markers
 		var p = 20;  // center; probably broken if area not square
-		viz.append("svg:g").attr("class", "labels").selectAll("text").data(d3.range(30, 361, 30)).enter().append("svg:text").attr("dy", "-4px").attr("transform", function(d) {
-			return "translate(" + r + "," + p + ") rotate(" + d + ",0," + (r - p) + ")"
-		}).text(function(dir) {
-			return dir;
+//		viz.append("svg:g").attr("class", "labels").selectAll("text").data(d3.range(30, 361, 30)).enter().append("svg:text").attr("dy", "-4px").attr("transform", function(d) {
+//			return "translate(" + r + "," + p + ") rotate(" + d + ",0," + (r - p) + ")"
+		viz.append("svg:g").attr("class", "labels").selectAll("text").data(mdElements).enter().append("svg:text").attr("dy", "-4px").attr("transform", function(d) {
+//			return "translate(" + r + "," + p + ") rotate(" + modsEls2Degrees[d] + ",0," + (r - p) + ")"
+			return "translate(" + r + "," + p + ") rotate(" + modsEls2Degrees[d] + ",0," + (r - p) + ")"
+		}).text(function(d) {
+			return d;
 		});
 
 		// Labels:  metadata elements

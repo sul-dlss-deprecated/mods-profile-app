@@ -2,9 +2,6 @@
 
 <script type="text/javascript">
 
-	// Width of the whole visualization; used for centering
-	var visSize = 400;
-
 	var mdElements  = [
 		'abstract',
 		'accessCondition', 
@@ -41,10 +38,11 @@
 	populateMappings();
 
 	var myData = {
-		'abstract' : 215,
-		'identifier' : 54,
+		'abstract' : 53,
+		'identifier' : 213,
+		'originInfo' : 152,
 		'subject' : 110,
-		'titleInfo' : 16,
+		'titleInfo' : 215,
 		'typeOfResource' : 172};
 
 	function prepData(h) {
@@ -61,8 +59,7 @@
 		return result;
 	}
 
-	var vizData = prepData(myData);
-	function dataMax(vizData) {
+	function vizDataMax(vizData) {
 		result = 0;
 		for (var i=0; i < vizData.length; i++)
 		{
@@ -71,23 +68,25 @@
 		return result;
 	}
 
-	// TO DO:  should scale axes and data to the maximum "s" in data.
+	var vizData = prepData(myData);
+	var dataMax = vizDataMax(vizData);
+
+	// Width of the whole visualization; used for centering
+	var vizSize = 400;
 
 	// Map a degree to a color
-	var valToColorScale = d3.scale.linear().domain([0, 360]).range(["hsl(30, 70%, 70%)", "hsl(250, 70%, 40%)"]).interpolate(d3.interpolateHsl);
+	var valToColorScale = d3.scale.linear().domain([0, 360]).range(["hsl(20, 70%, 70%)", "hsl(700, 70%, 40%)"]).interpolate(d3.interpolateHsl);
 	function arcToColor(d) {
-		return valToColorScale(d.s);
+		return valToColorScale(d.d);
 	}
 	
 	// Map a number to a radius size
-//	numToRadiusScale = d3.scale.linear().domain([0, visSize]).range([0, visSize / 2]);
-	numToRadiusScale = d3.scale.linear().domain([0, dataMax(vizData)]).range([0, 180]);
-//	numToRadiusScale = d3.scale.linear().domain([0, dataMax(mdRoseData)]);
+	numToRadiusScale = d3.scale.linear().domain([0, dataMax]).range([0, vizSize / 2 - 20]);
 	function numToRadius(n) {
 		return numToRadiusScale(n);
 	}	
 
-	drawMetadataRose(vizData, '#mdrose', visSize);
+	drawMetadataRose(vizData, '#mdrose', vizSize);
 
 
 
@@ -106,12 +105,12 @@
 
 		// Transformation to place a mark on top of an arc
 		function arcTextT(d) {
-			var tr = numToRadius(d.d);
+			var tr = numToRadius(d.s);
 			return "translate(" + visWidth/2 + "," + (visWidth/2 - tr) + ")" + "rotate(" + d.d + ",0," + tr + ")";
 		};
 
 		// Options for drawing the roseArc
-		var mdroseArcOptions = {
+		var arcOptions = {
 			width: 8, // degrees of width to draw
 			from: 0, // starting radius
 			to: numToRadius
@@ -137,19 +136,19 @@
 				});
 			};
 
-		function drawMetadataArcs(parent, plotData, colorFunc, arcTextFunc, arcTextT) {
-			parent.append("svg:g").attr("class", "arcs").selectAll("path").data(plotData).enter().append("svg:path").attr("d", roseArc(mdroseArcOptions)).style("fill", colorFunc).attr("transform", "translate("+ visWidth / 2 + "," + visWidth / 2 + ")").append("svg:title").text(function(d) {
+		function drawMetadataArcs(parentEl, plotData, colorFunc, arcTextFunc, arcTextT) {
+			parentEl.append("svg:g").attr("class", "arcs").selectAll("path").data(plotData).enter().append("svg:path").attr("d", roseArc(arcOptions)).style("fill", colorFunc).attr("transform", "translate("+ visWidth / 2 + "," + visWidth / 2 + ")").append("svg:title").text(function(d) {
 				return d.d + "\u00b0; " + d.s
 			});
 			
 			// add text to arcs
-			parent.append("svg:g").attr("class", "arctext").selectAll("text").data(plotData).enter().append("svg:text").text(arcTextFunc).attr("dy", "-3px").attr("transform", arcTextT);
+			parentEl.append("svg:g").attr("class", "arctext").selectAll("text").data(plotData).enter().append("svg:text").text(arcTextFunc).attr("dy", "-3px").attr("transform", arcTextT);
 		}
 
 		drawMetadataArcs(vizEl, mdRoseData, arcToColor, arcText, arcTextT);
 		
 		
-		// --- Labels and Axes in the Rose ---
+		// --- Draw Labels and Axes in the Rose ---
 		
 		// Axes circles - chart ticks
 		var tickrings = d3.range(0, 181, 20);

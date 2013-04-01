@@ -39,11 +39,21 @@
 
 	var myData = {
 		'abstract' : 53,
-		'identifier' : 213,
-		'originInfo' : 152,
 		'subject' : 110,
-		'titleInfo' : 215,
+		'name' : 160,
+		'identifier' : 313,
+		'originInfo' : 152,
+		'titleInfo' : 267,
 		'typeOfResource' : 172};
+
+	var myData2 = {
+		'language' : 43,
+		'subject' : 25,
+		'name' : 43,
+		'identifier' : 47,
+		'originInfo' : 25,
+		'titleInfo' : 47,
+		'typeOfResource' : 15};
 
 	function prepData(h) {
 		var result = [];
@@ -58,7 +68,44 @@
 		}
 		return result;
 	}
+	
+	var actual_json = {"responseHeader":
+	{"status":0,
+	"QTime":2,
+	"params":{
+			"facet.query":	["abstract_sim:*","identifier_sim:*"],
+			"q":"collection:kolb",
+			"facet.field":"language_sim",
+			"wt":"json",
+			"json.nl":"arrarr",
+			"rows":"0"
+			}
+		},
+	"response":	{
+				"numFound":1402,
+				"start":0,
+				"maxScore":4.3902082,
+				"docs":[]
+		},
+	"facet_counts": {
+		"facet_queries": {
+			"abstract_sim:*":1366,
+			"identifier_sim:*":39
+		},
+		"facet_fields":{
+			"language_sim":[
+				["eng English",1361],
+				["eng eng",34],
+				[null,7]
+			]
+		},
+		"facet_dates":{},
+		"facet_ranges":{}
+		}
+	}
+		
 
+	// FIXME:  this should be replaced by "numFound" in Solr Response - the maximum possible
 	function vizDataMax(vizData) {
 		result = 0;
 		for (var i=0; i < vizData.length; i++)
@@ -81,7 +128,7 @@
 	}
 	
 	// Map a number to a radius size
-	numToRadiusScale = d3.scale.linear().domain([0, dataMax]).range([0, vizSize / 2 - 20]);
+	numToRadiusScale = d3.scale.linear().domain([0, dataMax]).rangeRound([0, vizSize / 2 - 10]);
 	function numToRadius(n) {
 		return numToRadiusScale(n);
 	}	
@@ -111,7 +158,7 @@
 
 		// Options for drawing the roseArc
 		var arcOptions = {
-			width: 8, // degrees of width to draw
+			width: 16, // degrees of width to draw
 			from: 0, // starting radius
 			to: numToRadius
 		}
@@ -128,7 +175,7 @@
 		//     s: size
 		var roseArc = function(opts) {
 			return d3.svg.arc().startAngle(function(d) {
-				return (d.d - opts.width) * Math.PI / 180;
+				return d.d * Math.PI / 180;
 			}).endAngle(function(d) {
 				return (d.d + opts.width) * Math.PI / 180;
 			}).innerRadius(opts.from).outerRadius(function(d) {
@@ -151,28 +198,22 @@
 		// --- Draw Labels and Axes in the Rose ---
 		
 		// Axes circles - chart ticks
-		var tickrings = d3.range(0, 181, 20);
-		tickRadiusScale = d3.scale.linear().domain(tickrings).range(d3.range(0, 181, 20)).clamp(true);
-		vizEl.append("svg:g").attr("class", "axes").selectAll("circle").data(tickrings).enter().append("svg:circle").attr("stroke-width", 1).attr("stroke", "black").attr("fill-opacity", 0.0).attr("cx", r).attr("cy", r).attr("r", tickRadiusScale);
+		var tickrings = d3.range(0, dataMax, dataMax / 10);
+		vizEl.append("svg:g").attr("class", "axes").selectAll("circle").data(tickrings).enter().append("svg:circle").attr("stroke-width", 1).attr("stroke", "gray").attr("fill-opacity", 0.0).attr("cx", r).attr("cy", r).attr("r", numToRadiusScale);
 
 		// Labels for axes circles
-		var tickmarks = d3.range(20, 161, 40);
-		tickmarkRadiusScale = d3.scale.linear().domain(tickmarks).range(d3.range(20, 161, 40)).clamp(true);
+		var tickmarks = d3.range(20, dataMax, dataMax / 5);
 		var tickLabel = function(d) {
 			return "" + d;
 		}
 		vizEl.append("svg:g").attr("class", "tickmarks").selectAll("text").data(tickmarks).enter().append("svg:text").text(tickLabel).attr("dy", "-1px").attr("transform", function(d) {
-			var y = visWidth - tickmarkRadiusScale(d);
+			var y = visWidth - numToRadiusScale(d);
 			y = y - 200;
 			return "translate(" + r + "," + y + ") "
 		})
 
-		// Labels: degree markers
+		// Labels:  metadata elements
 		var p = 20;  // center; probably broken if area not square
-		// degrees
-//	vizEl.append("svg:g").attr("class", "labels").selectAll("text").data(d3.range(30, 361, 30)).enter().append("svg:text").attr("dy", "-4px").attr("transform", function(d) {
-//			return "translate(" + r + "," + p + ") rotate(" + d + ",0," + (r - p) + ")"
-		// metadata elements
 		vizEl.append("svg:g").attr("class", "labels").selectAll("text").data(mdElements).enter().append("svg:text").attr("dy", "-4px").attr("transform", function(d) {
 			return "translate(" + r + "," + p + ") rotate(" + modsEls2Degrees[d] + ",0," + (r - p) + ")"
 		}).text(function(d) {

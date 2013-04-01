@@ -41,11 +41,11 @@
 	populateMappings();
 
 	var myData = {
-		'abstract' : 5,
-		'subject' : 2,
-		'titleInfo' : 3,
-		'identifier' : 4,
-		'typeOfResource' : 5};
+		'abstract' : 215,
+		'identifier' : 54,
+		'subject' : 110,
+		'titleInfo' : 16,
+		'typeOfResource' : 172};
 
 	function prepData(h) {
 		var result = [];
@@ -61,44 +61,34 @@
 		return result;
 	}
 
-	function realerData() {
-		var result = [];
-		for (var i=0; i < mdElements.length; i++) {
-			result.push({
-				d: modsEls2Degrees[mdElements[i]],  // direction (degrees of the circle)
-				s: i // size
-			})
+	var vizData = prepData(myData);
+	function dataMax(vizData) {
+		result = 0;
+		for (var i=0; i < vizData.length; i++)
+		{
+			result = Math.max(result, vizData[i].s);
 		}
 		return result;
 	}
 
-	function fakeData() {
-		var result = [];
-		for (var i=1; i < 37; i++) {
-			result.push({
-				d: i * 10,  // direction (degrees of the circle)
-				s: i  // size
-			})
-		}
-		return result;
-	}
+	// TO DO:  should scale axes and data to the maximum "s" in data.
 
-	// Map a value to a color
-	var valToColorScale = d3.scale.linear().domain([5, 25]).range(["hsl(30, 70%, 70%)", "hsl(250, 70%, 40%)"]).interpolate(d3.interpolateHsl);
+	// Map a degree to a color
+	var valToColorScale = d3.scale.linear().domain([0, 360]).range(["hsl(30, 70%, 70%)", "hsl(250, 70%, 40%)"]).interpolate(d3.interpolateHsl);
 	function arcToColor(d) {
 		return valToColorScale(d.s);
 	}
-
+	
 	// Map a number to a radius size
-//	numToRadiusScale = d3.scale.linear().domain([0, visSize]).range([0, visSize / 2]).clamp(true);
-	numToRadiusScale = d3.scale.linear().domain([0, visSize]).range([0, visSize / 2]);
+//	numToRadiusScale = d3.scale.linear().domain([0, visSize]).range([0, visSize / 2]);
+	numToRadiusScale = d3.scale.linear().domain([0, dataMax(vizData)]).range([0, 180]);
+//	numToRadiusScale = d3.scale.linear().domain([0, dataMax(mdRoseData)]);
 	function numToRadius(n) {
-		return numToRadiusScale(n)
-	}
+		return numToRadiusScale(n);
+	}	
 
-	drawMetadataRose(realerData, "#mdrose", visSize);
-//	drawMetadataRose(fakeData, "#mdrose", visSize);
-//	drawMetadataRose(prepData(myData), '#mdrose', visSize);
+	drawMetadataRose(vizData, '#mdrose', visSize);
+
 
 
 	// Draw a complete metadata rose visualization, including axes
@@ -107,12 +97,11 @@
 		var r = visWidth / 2;  // radius of rose; also center pixel for rose width and height
 			
 		// The main SVG visualization element
-		var viz = d3.select(container).append("svg:svg").attr("width", visWidth + "px").attr("height", (visWidth + 30) + "px");
+		var vizEl = d3.select(container).append("svg:svg").attr("width", visWidth + "px").attr("height", (visWidth + 30) + "px");
 
-		// Return a string representing d this datum
-		function hoverText(d) {
-//			return d.s.toFixed(0);
-			return degrees2modsEls[d.d].substring(0, Math.min(3, degrees2modsEls[d.d].length));
+		// Return short string to place at end of arc based on degree
+		function arcText(d) {
+			return degrees2modsEls[d.d].substring(0, Math.min(4, degrees2modsEls[d.d].length));
 		};
 
 		// Transformation to place a mark on top of an arc
@@ -139,25 +128,25 @@
 		//     d: direction in degrees
 		//     s: size
 		var roseArc = function(opts) {
-			return d3.svg.arc().startAngle(function(p) {
-				return (p.d - opts.width) * Math.PI / 180;
-			}).endAngle(function(p) {
-				return (p.d + opts.width) * Math.PI / 180;
-			}).innerRadius(opts.from).outerRadius(function(p) {
-					return opts.to(p.d)
+			return d3.svg.arc().startAngle(function(d) {
+				return (d.d - opts.width) * Math.PI / 180;
+			}).endAngle(function(d) {
+				return (d.d + opts.width) * Math.PI / 180;
+			}).innerRadius(opts.from).outerRadius(function(d) {
+					return opts.to(d.s)
 				});
 			};
 
 		function drawMetadataArcs(parent, plotData, colorFunc, arcTextFunc, arcTextT) {
 			parent.append("svg:g").attr("class", "arcs").selectAll("path").data(plotData).enter().append("svg:path").attr("d", roseArc(mdroseArcOptions)).style("fill", colorFunc).attr("transform", "translate("+ visWidth / 2 + "," + visWidth / 2 + ")").append("svg:title").text(function(d) {
-				return d.d + "\u00b0; " + d.s.toFixed(0)
+				return d.d + "\u00b0; " + d.s
 			});
 			
 			// add text to arcs
 			parent.append("svg:g").attr("class", "arctext").selectAll("text").data(plotData).enter().append("svg:text").text(arcTextFunc).attr("dy", "-3px").attr("transform", arcTextT);
 		}
 
-		drawMetadataArcs(viz, mdRoseData, arcToColor, hoverText, arcTextT);
+		drawMetadataArcs(vizEl, mdRoseData, arcToColor, arcText, arcTextT);
 		
 		
 		// --- Labels and Axes in the Rose ---
@@ -165,7 +154,7 @@
 		// Axes circles - chart ticks
 		var tickrings = d3.range(0, 181, 20);
 		tickRadiusScale = d3.scale.linear().domain(tickrings).range(d3.range(0, 181, 20)).clamp(true);
-		viz.append("svg:g").attr("class", "axes").selectAll("circle").data(tickrings).enter().append("svg:circle").attr("stroke-width", 1).attr("stroke", "black").attr("fill-opacity", 0.0).attr("cx", r).attr("cy", r).attr("r", tickRadiusScale);
+		vizEl.append("svg:g").attr("class", "axes").selectAll("circle").data(tickrings).enter().append("svg:circle").attr("stroke-width", 1).attr("stroke", "black").attr("fill-opacity", 0.0).attr("cx", r).attr("cy", r).attr("r", tickRadiusScale);
 
 		// Labels for axes circles
 		var tickmarks = d3.range(20, 161, 40);
@@ -173,7 +162,7 @@
 		var tickLabel = function(d) {
 			return "" + d;
 		}
-		viz.append("svg:g").attr("class", "tickmarks").selectAll("text").data(tickmarks).enter().append("svg:text").text(tickLabel).attr("dy", "-1px").attr("transform", function(d) {
+		vizEl.append("svg:g").attr("class", "tickmarks").selectAll("text").data(tickmarks).enter().append("svg:text").text(tickLabel).attr("dy", "-1px").attr("transform", function(d) {
 			var y = visWidth - tickmarkRadiusScale(d);
 			y = y - 200;
 			return "translate(" + r + "," + y + ") "
@@ -181,23 +170,15 @@
 
 		// Labels: degree markers
 		var p = 20;  // center; probably broken if area not square
-//		viz.append("svg:g").attr("class", "labels").selectAll("text").data(d3.range(30, 361, 30)).enter().append("svg:text").attr("dy", "-4px").attr("transform", function(d) {
+		// degrees
+//	vizEl.append("svg:g").attr("class", "labels").selectAll("text").data(d3.range(30, 361, 30)).enter().append("svg:text").attr("dy", "-4px").attr("transform", function(d) {
 //			return "translate(" + r + "," + p + ") rotate(" + d + ",0," + (r - p) + ")"
-		viz.append("svg:g").attr("class", "labels").selectAll("text").data(mdElements).enter().append("svg:text").attr("x", 40).attr("dy", "-4px").attr("transform", function(d) {
-//			return "translate(" + r + "," + p + ") rotate(" + modsEls2Degrees[d] + ",0," + (r - p) + ")"
+		// metadata elements
+		vizEl.append("svg:g").attr("class", "labels").selectAll("text").data(mdElements).enter().append("svg:text").attr("dy", "-4px").attr("transform", function(d) {
 			return "translate(" + r + "," + p + ") rotate(" + modsEls2Degrees[d] + ",0," + (r - p) + ")"
 		}).text(function(d) {
 			return d;
 		});
-
-		// Labels:  metadata elements
-//		var mdElements  = ['abstract', 'genre', 'name', 'language', 'identifier', 'note', 'originInfo', 'physicalDescription', 'subject', 'titleInfo', 'typeOfResource'];
-//		viz.append("svg:g").attr("class", "labels").selectAll("text").data(d3.values(mdElements)).enter().append("svg:text").attr("dy", "-4px").attr("transform", function(mdRoseData) {
-//			return "translate(" + r + "," + p + ") rotate(" + mdRoseData + ",0," + (r - p) + ")"
-//		}).text(function(dir) {
-//			return dir;
-//		});
-
-	}
+	} // end drawMetadataRose
 
 </script>
